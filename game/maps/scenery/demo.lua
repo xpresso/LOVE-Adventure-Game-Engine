@@ -1,5 +1,4 @@
 table.insert(scenery, { id = "Chimney",  x = 320, y = 360, z = 2, sx = 1, sy = 1, elev = -270} )
-table.insert(scenery, { id = "Door Closed 1",  x = 480, y = 320.01, z = 2, sx = 1, sy = 1, elev = -0.01} )
 table.insert(scenery, { id = "Flower 1",  x = 432, y = 360, z = 2, sx = 1, sy = 1, elev = 0} )
 table.insert(scenery, { id = "Flower 1",  x = 528, y = 328, z = 2, sx = 1, sy = 1, elev = 0} )
 table.insert(scenery, { id = "Flower 2",  x = 352, y = 360, z = 2, sx = 1, sy = 1, elev = 0} )

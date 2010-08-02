@@ -35,7 +35,7 @@ function drawMapComposite(dt)
 					gr.drawq(sl.i, sl.q, x, y, 0, 1, 1, sl.ox, sl.oy)
 				elseif s.n == "Pushable" then
 					sl = sceneryLibrary[s.img]
-					local x, y = s.x+mapOffsetX+sl.ox, s.y+mapOffsetY
+					local x, y = s.x+mapOffsetX, s.y+mapOffsetY
 					gr.drawq(sl.i, sl.q, x, y, 0, 1, 1, sl.ox, sl.oy)
 				elseif s.n == "Enemy" then
 					local sy, eof, px, py

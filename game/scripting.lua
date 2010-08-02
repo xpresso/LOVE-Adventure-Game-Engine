@@ -1,4 +1,4 @@
----Load the script of your choice.
+--Load the script of your choice.
 function loadScript(s)
 	print("Loaded Script "..s)
 	chainScript = ""

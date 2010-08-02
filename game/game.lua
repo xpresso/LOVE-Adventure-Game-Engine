@@ -510,7 +510,7 @@ function loadSceneryLibrary()
 
 	sceneryLibrary["Sign"] = { i = imgScenery, q = gr.newQuad(256, 32, 32, 32, tw1, th1), ox = 16, oy = 32, ani = false }
 
-	sceneryLibrary["Barrel"] = { i = imgScenery, q = gr.newQuad(128, 408, 32, 40, tw1, th1), ox = 16, oy = 40, ani = false }
+	sceneryLibrary["Barrel"] = { i = imgScenery, q = gr.newQuad(128, 408, 32, 40, tw1, th1), ox = 0, oy = 40, ani = false }
 
 	sceneryLibrary["Bridge Railing Long"] = { i = imgScenery, q = gr.newQuad(9*32, 96, 96, 16, tw1, th1), ox = 0, oy = 16, ani = false }
 	sceneryLibrary["Bridge Shadow Long"] = { i = imgScenery, q = gr.newQuad(9*32, 112, 96, 16, tw1, th1), ox = 0, oy = 0, ani = false }
