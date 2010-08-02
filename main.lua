@@ -44,7 +44,7 @@ function love.run()
 			for e,a,b,c in love.event.poll() do
 				if e == "q" then
 					if love.audio then love.audio.stop() end
-					print("Quit Game (" .. gameMode .. ") at " .. time .. "\n\n-------------------------------------")
+					print("Quit Game (" .. gameMode .. ") at " .. time .. "\n- END GAME ------------------------------------\n\n")
 					return
 				end
 				love.handlers[e](a,b,c)
