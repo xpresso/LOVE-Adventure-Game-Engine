@@ -814,7 +814,9 @@ function editorMouseDown(x,y,button)
 
 	else
 		if editorModeScreen == 1 and button == "l" then
-			if editorCanUndo then editorSave("undo") end
+			if editorCanUndo then
+			  --editorSave("undo")
+			end
 			if editorCurrentLayer >= 1 and editorCurrentLayer <= 3 then
 				editorPlaceTile()
 			elseif editorCurrentLayer == 4 then
@@ -1024,7 +1026,7 @@ function editorPlaceTile()
   else
   	tile = string.sub("0" .. curTileX, -2) .. string.sub("0" .. curTileY, -2)
   end
-  print(tile, curTileX, curTileY)
+  --print(tile, curTileX, curTileY)
 	if editorCurrentLayer == 1 then
 		mapTiles[editorMouseTileX][editorMouseTileY] = tile
 	elseif editorCurrentLayer == 2 then

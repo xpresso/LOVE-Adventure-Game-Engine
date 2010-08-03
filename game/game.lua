@@ -369,9 +369,9 @@ end
 
 function loadNPCs()
 	npc = {}
-	addNPC(1, "courtyard", 39*32, 14*32, "Kristen", 2, 4, false, "npcs/npc_kristen")
-	addNPC(2, "courtyard", 36*32, 19*32, "Zooey", 3, 4, false, "npcs/npc_zooey")
-	addNPC(3, "courtyard", 25*32, 14*32, "Guard", 4, 4, false, "npcs/npc_guard")
+	addNPC(1, "courtyard", 39*32, 16*32, "Kristen", 2, 4, false, "npcs/npc_kristen")
+	addNPC(2, "courtyard", 36*32, 21*32, "Zooey", 3, 4, false, "npcs/npc_zooey")
+	addNPC(3, "courtyard", 25*32, 15*32, "Guard", 4, 4, false, "npcs/npc_guard")
 	addNPC(4, "inn_firstfloor", 6*32, 4*32, "Inn Keeper", 5, 4, false, "npcs/npc_innkeeper")
 	addNPC(5, "inn_firstfloor", 17*32, 6*32, "Bar Keeper", 1, 4, false, "npcs/npc_barkeeper")
 	addNPC(6, "inn_secondfloor", 18*32, 4*32, "Julie", 6, 4, false, "npcs/npc_julie")
@@ -381,10 +381,9 @@ end
 
 function loadSwitches()
 	switch = {}
-	addSwitch(1, "courtyard", 24*32, 15*32, 1, "Sign", "Sign", 1, "switches/sign", 0, 32)
---	addSwitch(2, "courtyard", 16*32, 15*32, 0, "Barrel", "Barrel", 2, "switches/barrel", 0, 32)
+	addSwitch(1, "courtyard", 24*32, 16*32, 1, "Sign", "Sign", 1, "switches/sign", 0, 32)
+	addSwitch(2, "courtyard", 35*32, 13*32, 1, "Sign", "Sign", 1, "switches/sign2", 0, 32)
 	addSwitch(3, "shed", 12*32, 6*32, 0, "Chest Opened", "Chest Closed", 1, "switches/chest", 0, 32)
-	addSwitch(4, "courtyard", 35*32, 12*32, 1, "Sign", "Sign", 1, "switches/sign2", 0, 32)
 end
 
 function setupItemTable()
@@ -544,13 +543,18 @@ function loadSceneryLibrary()
 	sceneryLibrary["Roof H5 M"] = { i = imgScenery, q = gr.newQuad(160, 512+96, 176, 32, tw1, th1), ox = 0, oy = 32, ani = false }
 	sceneryLibrary["Roof H5 B"] = { i = imgScenery, q = gr.newQuad(160, 512+96+32, 176, 112, tw1, th1), ox = 0, oy = 112, ani = false }
 
-	sceneryLibrary["Roof V4 M"] = { i = imgScenery, q = gr.newQuad(480, 592, 32, 160, tw1, th1), ox = 0, oy = 160, ani = false }
-
 	sceneryLibrary["Roof V4 L"] = { i = imgScenery, q = gr.newQuad(408, 592, 8, 160, tw1, th1), ox = 0, oy = 160, ani = false }
+	sceneryLibrary["Roof V4 M"] = { i = imgScenery, q = gr.newQuad(480, 592, 32, 160, tw1, th1), ox = 0, oy = 160, ani = false }
 	sceneryLibrary["Roof V4 R"] = { i = imgScenery, q = gr.newQuad(400, 592, 8, 160, tw1, th1), ox = 0, oy = 160, ani = false }
 
 	sceneryLibrary["Roof V4 RA"] = { i = imgScenery, q = gr.newQuad(344, 592, 56, 160, tw1, th1), ox = 0, oy = 160, ani = false }
 	sceneryLibrary["Roof V4 LA"] = { i = imgScenery, q = gr.newQuad(416, 592, 56, 160, tw1, th1), ox = 0, oy = 160, ani = false }
+
+
+	sceneryLibrary["Roof V3 L"] = { i = imgScenery, q = gr.newQuad(464, 464, 8, 128, tw1, th1), ox = 0, oy = 128, ani = false }
+	sceneryLibrary["Roof V3 M"] = { i = imgScenery, q = gr.newQuad(472, 464, 32, 128, tw1, th1), ox = 0, oy = 128, ani = false }
+	sceneryLibrary["Roof V3 R"] = { i = imgScenery, q = gr.newQuad(472+32, 464, 8, 128, tw1, th1), ox = 0, oy = 128, ani = false }
+
 
 	sceneryLibrary["Clock Face"] = { i = imgScenery, q = gr.newQuad(224, 352, 64, 64, tw1, th1), ox = 32, oy = 32, ani = false }
 	sceneryLibrary["Clock Hand Minute"] = { i = imgScenery, q = gr.newQuad(224+64, 352, 2, 32, tw1, th1), ox = 1, oy = 4, ani = false }

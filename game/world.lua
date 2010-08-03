@@ -268,7 +268,7 @@ end
 function updateNPCs()
 	for i, p in ipairs(npc) do
 		if mapNumber == p.map then
-			mapHit[p.x/32][(p.y-32)/32] = "n"
+			if mapHit[p.x/32][(p.y-32)/32] == "." then mapHit[p.x/32][(p.y-32)/32] = "n" end
 		end
 	end
 
