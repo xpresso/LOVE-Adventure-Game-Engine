@@ -295,8 +295,8 @@ function resetGameVars(testing)
 
 	player = {
 		name = tmpName,
-		x = 13 * 32,
-		y = 16 * 32,
+		x = 12*32,
+		y = 3*32,
 		cx = 0,
 		cy = 0,
 		oldXY = 0,
@@ -370,7 +370,7 @@ end
 function loadNPCs()
 	npc = {}
 	addNPC(1, "courtyard", 39*32, 16*32, "Kristen", 2, 4, false, "npcs/npc_kristen")
-	addNPC(2, "courtyard", 36*32, 21*32, "Zooey", 3, 4, false, "npcs/npc_zooey")
+	addNPC(2, "courtyard", 34*32, 19*32, "Zooey", 3, 4, false, "npcs/npc_zooey")
 	addNPC(3, "courtyard", 25*32, 15*32, "Guard", 4, 4, false, "npcs/npc_guard")
 	addNPC(4, "inn_firstfloor", 6*32, 4*32, "Inn Keeper", 5, 4, false, "npcs/npc_innkeeper")
 	addNPC(5, "inn_firstfloor", 17*32, 6*32, "Bar Keeper", 1, 4, false, "npcs/npc_barkeeper")
@@ -511,6 +511,8 @@ function loadSceneryLibrary()
 	sceneryLibrary["Sign"] = { i = imgScenery, q = gr.newQuad(256, 32, 32, 32, tw1, th1), ox = 16, oy = 32, ani = false }
 
 	sceneryLibrary["Barrel"] = { i = imgScenery, q = gr.newQuad(128, 408, 32, 40, tw1, th1), ox = 0, oy = 40, ani = false }
+
+	sceneryLibrary["Crate"] = { i = imgScenery, q = gr.newQuad(160, 400-8, 32, 56, tw1, th1), ox = 0, oy = 56, ani = false }
 
 	sceneryLibrary["Bridge Railing Long"] = { i = imgScenery, q = gr.newQuad(9*32, 96, 96, 16, tw1, th1), ox = 0, oy = 16, ani = false }
 	sceneryLibrary["Bridge Shadow Long"] = { i = imgScenery, q = gr.newQuad(9*32, 112, 96, 16, tw1, th1), ox = 0, oy = 0, ani = false }

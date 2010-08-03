@@ -5,8 +5,7 @@ if dialog.queryChoice == 1 then
 	else
 		player.money = player.money - 5
 		table.insert(script, {c = "FILLHEALTH", p1 = nil, p2 = nil, p3 = nil, p4 = nil, d = false})
-		insertDialog("[Insert cool \"Sleeping at the Inn\" music here!]", 0)
-		insertWait(1)
+		insertWait(1.5)
 		insertWarp("inn_secondfloor", 14, 3.6, "D")
 		fade.to = 255
 	end

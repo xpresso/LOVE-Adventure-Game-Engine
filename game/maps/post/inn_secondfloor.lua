@@ -1,10 +1,10 @@
 changeMusic = 4
 mapName = "Forest Inn (Second Floor)"
 
-addPushable(1, 7*32, 3*32, 14, true, "Barrel", "")
-addPushable(2, 8*32, 3*32, 14, true, "Barrel", "")
-addPushable(3, 9*32, 3*32, 14, true, "Barrel", "")
-addPushable(4, 9*32, 4*32, 14, true, "Barrel", "")
+addPushable(1, 7*32, 3*32, 14, true, "Crate", "")
+addPushable(2, 8*32, 3*32, 14, true, "Crate", "")
+addPushable(3, 9*32, 3*32, 14, true, "Crate", "")
+addPushable(4, 9*32, 4*32, 14, true, "Crate", "")
 
 addPushable(5, 5*32, 8*32, 14, true, "Barrel", "")
 addPushable(6, 5*32, 9*32, 14, true, "Barrel", "")
