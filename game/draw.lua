@@ -54,7 +54,7 @@ function drawMapComposite(dt)
 				elseif s.n == "NPC" then
 					if s.map == mapNumber then
 						local sy = ((_f(s.step/16)) + ((s.who - 1) * 2))
-						gr.drawq(npcs, npcGrid[s.facing-1][sy], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))+32, 0, 1, 1, 0, 48)
+						gr.drawq(npcs, npcGrid[s.facing-1][sy], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY)), 0, 1, 1, 0, 48)
 						if s.somethingToSay == true then
 							gr.drawq(menuTitle, notifGrid[3], s.x + mapOffsetX+16, s.y + mapOffsetY - 8 + _s(time*5)*3, 0, 1, 1, 16, 48)
 						end

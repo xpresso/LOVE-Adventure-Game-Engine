@@ -3,7 +3,7 @@ mapName = "House in the Suburbs"
 
 addPushable(1, 8*32, 10*32, 14, true, "Barrel", "", -1)
 
-addPushable(2, 15*32, 9*32, 80, false, "Door Closed 1", "warps/door_inn_in")
+addPushable(2, 15*32, 9*32+.01, 80, false, "Door Closed 1", "warps/door_inn_in")
 
 local tmm = "Helllllo"
 

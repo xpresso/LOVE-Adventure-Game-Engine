@@ -157,7 +157,8 @@ function buildInventory()
 end
 
 function updateGameTime(dt)
-  if actionPaused == false then gameTime.t = gameTime.t + (dt * 600) end
+  --if actionPaused == false then gameTime.t = gameTime.t + (dt * 600) end
+  gameTime.t = os.time()-(60*60*4)
   gameTime.h = gameTime.t/60/60
   gameTime.m = gameTime.t/60
   gameTime.s = gameTime.t
@@ -368,14 +369,14 @@ end
 
 function loadNPCs()
 	npc = {}
-	addNPC(1, "courtyard", 39*32, 13*32, "Kristen", 2, 4, false, "npcs/npc_kristen")
-	addNPC(2, "courtyard", 36*32, 18*32, "Zooey", 3, 4, false, "npcs/npc_zooey")
-	addNPC(3, "courtyard", 25*32, 13*32, "Guard", 4, 4, false, "npcs/npc_guard")
-	addNPC(4, "inn_firstfloor", 6*32, 3*32, "Inn Keeper", 5, 4, false, "npcs/npc_innkeeper")
-	addNPC(5, "inn_firstfloor", 17*32, 5*32, "Bar Keeper", 1, 4, false, "npcs/npc_barkeeper")
-	addNPC(6, "inn_secondfloor", 18*32, 3*32, "Julie", 6, 4, false, "npcs/npc_julie")
-	addNPC(7, "inn_firstfloor", 5*32, 7*32, "Wife", 7, 3, false, "npcs/npc_wife")
-	addNPC(8, "inn_firstfloor", 7*32, 7*32, "Husband", 8, 1, false, "npcs/npc_husband")
+	addNPC(1, "courtyard", 39*32, 14*32, "Kristen", 2, 4, false, "npcs/npc_kristen")
+	addNPC(2, "courtyard", 36*32, 19*32, "Zooey", 3, 4, false, "npcs/npc_zooey")
+	addNPC(3, "courtyard", 25*32, 14*32, "Guard", 4, 4, false, "npcs/npc_guard")
+	addNPC(4, "inn_firstfloor", 6*32, 4*32, "Inn Keeper", 5, 4, false, "npcs/npc_innkeeper")
+	addNPC(5, "inn_firstfloor", 17*32, 6*32, "Bar Keeper", 1, 4, false, "npcs/npc_barkeeper")
+	addNPC(6, "inn_secondfloor", 18*32, 4*32, "Julie", 6, 4, false, "npcs/npc_julie")
+	addNPC(7, "inn_firstfloor", 5*32, 8*32, "Wife", 7, 3, false, "npcs/npc_wife")
+	addNPC(8, "inn_firstfloor", 7*32, 8*32, "Husband", 8, 1, false, "npcs/npc_husband")
 end
 
 function loadSwitches()
@@ -479,8 +480,8 @@ function loadSceneryLibrary()
 	sceneryLibrary["Roof Meet Left"] = { i = imgScenery, q = gr.newQuad(352, 160, 32, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Roof Top"] = { i = imgScenery, q = gr.newQuad(320, 160, 32, 32, tw1, th1), ox = 0, oy = 32, ani = false }
 
-	sceneryLibrary["Window"] = { i = imgScenery, q = gr.newQuad(0, 384, 34, 34, tw1, th1), ox = -1, oy = 34, ani = false }
-	sceneryLibrary["Window Wide"] = { i = imgScenery, q = gr.newQuad(48, 384, 64, 34, tw1, th1), ox = -1, oy = 34, ani = false }
+	sceneryLibrary["Window"] = { i = imgScenery, q = gr.newQuad(0, 384, 34, 34, tw1, th1), ox = 1, oy = 34, ani = false }
+	sceneryLibrary["Window Wide"] = { i = imgScenery, q = gr.newQuad(48, 384, 64, 34, tw1, th1), ox = 1, oy = 34, ani = false }
 
 	sceneryLibrary["Sign Inn"] = { i = imgScenery, q = gr.newQuad(320, 0, 32, 24, tw1, th1), ox = 0, oy = 24, ani = false }
 	sceneryLibrary["Sign Bar"] = { i = imgScenery, q = gr.newQuad(320, 24, 32, 24, tw1, th1), ox = 0, oy = 24, ani = false }

@@ -268,7 +268,7 @@ end
 function updateNPCs()
 	for i, p in ipairs(npc) do
 		if mapNumber == p.map then
-			mapHit[p.x/32][p.y/32] = "n"
+			mapHit[p.x/32][(p.y-32)/32] = "n"
 		end
 	end
 
@@ -516,7 +516,7 @@ function checkForThing()
 			elseif player.facing == 4 then
 				x,y,w,h = player.x+14,player.y,4,32
 			end
-			if overlap(x, y, w, h, p.x, p.y, 32, 32, 7929) then
+			if overlap(x, y, w, h, p.x, p.y-32, 32, 32, 7929) then
 				found = i
 				break
 			end
@@ -548,7 +548,7 @@ end
 function checkForPushSwitch()
 	local found = 0
 	for i, p in pairs(pushables) do
-		if p.x/32 == player.pushX and p.y/32 == player.pushY then
+		if _f(p.x/32) == player.pushX and _f(p.y/32) == player.pushY then
 			found = i + 3000
 			break
 		end

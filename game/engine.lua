@@ -115,8 +115,9 @@ function love.update(dt)
 	updateTimeOut()
 	sprites = {}
 
+	local editModeKey = kb.isDown("e")
+
 	if gameMode == inStartup then
-		local editModeKey = kb.isDown("e")
 		if logoExists == true then logoUpdate(dt) end
 		if time - startupTimer >= introLength then
 			if timeOutSet[10010] == nil then
@@ -146,6 +147,11 @@ function love.update(dt)
 		if kb.isDown("lshift") or kb.isDown("rshift") then local kShift = true else local kShift = false end
 	elseif gameMode == inGame then
 		if dialog.opened == false and scriptRunning == false and inventory.opened == false and menu.opened == false then actionPaused = false else actionPaused = true end
+
+		if editModeKey then
+			gameMode = editMode
+			loadEditor()
+		end
 
    	updateGameTime(dt)
 
@@ -360,7 +366,7 @@ function love.update(dt)
 					currentScript = switch[check-1000].script
 					check = 0
 					resetPush()
-				elseif check > 3000 and check <= 4000 and player.pushTime > .25 then
+				elseif check > 3000 and check <= 4000 and player.pushTime > .15 then
 					currentScript = pushables[check-3000].script
 					movePushable(check-3000,player.facing)
 					check = 0

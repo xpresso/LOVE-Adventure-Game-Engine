@@ -105,7 +105,7 @@ function runScript(dt)
 			elseif l == "WARPNPC" then
 				npc[p1].map = p2
 				npc[p1].x = tonumber(p3) * 32
-				npc[p1].y = tonumber(p4) * 32
+				npc[p1].y = tonumber(p4) * 32+32
 				for x=0,mapWidth/32-1 do
 					for y=0,mapHeight/32-1 do
 						if mapHit[x][y] == "n" then mapHit[x][y] = "." end
@@ -139,6 +139,10 @@ function runScript(dt)
 			elseif l == "ACTIVATESWITCH" then
 				if p3 > 0 then playSound(p3) end
 				switch[p1].state = p2
+				script[scriptLine].d = true
+			elseif l == "CHANGEPUSHABLEIMG" then
+				if p3 > 0 then playSound(p3) end
+				pushables[p1].img = p2
 				script[scriptLine].d = true
 			elseif l == "SETWEATHER" then
 				setWeather(p1, p2, p3)

@@ -399,7 +399,7 @@ function editorDraw(dt)
 
 			if editorCurrentLayer == 1 or editorCurrentLayer == 2 or editorCurrentLayer == 3 then
 				--Draw the current tile
-				data = data .. "\n\n      TILE\n"
+				data = data .. "\n\n      TILE\n      " .. curTileX .. "," .. curTileY
 				gr.setBlendMode("alpha")
 				gr.setColorMode("replace")
 				gr.setColor(255,255,255,100)
@@ -1018,11 +1018,13 @@ function editorLoadMap(m)
 end
 
 function editorPlaceTile()
+  local tile
   if editorSubMode == 1 then
-    local tile = "0000"
+    tile = "0000"
   else
-  	local tile = string.sub("0" .. curTileX, -2) .. string.sub("0" .. curTileY, -2)
+  	tile = string.sub("0" .. curTileX, -2) .. string.sub("0" .. curTileY, -2)
   end
+  print(tile, curTileX, curTileY)
 	if editorCurrentLayer == 1 then
 		mapTiles[editorMouseTileX][editorMouseTileY] = tile
 	elseif editorCurrentLayer == 2 then
@@ -1092,12 +1094,17 @@ function editorCalculateMapOffset()
 end
 
 function editorTestLevel()
-  testMapName = editorMapName
-	resetGameVars(true)
-	buildInventory()
-  menu.opened = false
-  menu.fadeTo = 0
-  menu.page = mpMain
-  menu.selection = 1
-	gameMode = inGame
+	local mFile = "game/maps/data/" .. editorMapName .. ".map"
+	if love.filesystem.exists(mFile) then
+    testMapName = editorMapName
+    resetGameVars(true)
+    buildInventory()
+    menu.opened = false
+    menu.fadeTo = 0
+    menu.page = mpMain
+    menu.selection = 1
+    gameMode = inGame
+  else
+    print("Please save first!")
+  end
 end
