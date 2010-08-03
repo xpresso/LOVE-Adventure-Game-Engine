@@ -1,5 +1,28 @@
 WELCOME!
 
-This is a simple README just to tell you the gist. This is a game.. Engine. It is supposed to be an engine for a Zelda-style adventure game with real-time overworld and shit. It's unfinished so don't think it's done.
+This is a simple README just to tell you the gist. This is a game.. Engine. It
+is supposed to be an engine for a Zelda-style adventure game with real-time
+overworld and shit. It's unfinished so don't think it's done.
 
 More will come.
+
+ATTENTION:
+In order to test this code, you must download and install Löve2D. A 2D game
+engine creation enviroment blah blah blah. Just download it.
+
+http://love2d.org/
+
+Next, drag the folder these files are in onto the Löve application icon. It will
+run.
+
+Alternatively...
+
+If on OS X:
+Rename the folder with a .love extension. You will then be able to double-click
+to run.
+
+If on Windows or OS X or Linux:
+Open this folder (You already have), select everything, at least main.lua and
+the game folder and ZIP the files into an archive. Make sure the main.lua file
+and game folder are at the root of the ZIP. Then rename the .zip with .love. You
+will then be able to double-click to run as well.
