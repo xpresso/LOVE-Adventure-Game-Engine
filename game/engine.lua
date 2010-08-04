@@ -1316,7 +1316,11 @@ function findAngle(x1, y1, x2, y2)
 	return t
 end
 
-function formatTime(t) return _f(_m(t/60/60,60)) .. ":" .. string.sub("0" .. _f(_m(t/60,60)),-2) .. ":" .. string.sub("0" .. _f(_m(t,60)),-2) end
+function formatTime(t, m)
+  local r = _f(_m(t/60/60,60)) .. ":" .. string.sub("0" .. _f(_m(t/60,60)),-2) .. ":" .. string.sub("0" .. _f(_m(t,60)),-2)
+  if m then r = r .. (t - _f(t)) end
+  return r
+end
 
 function trim(s) return (string.gsub(s, "^%s*(.-)%s*$", "%1")) end
 

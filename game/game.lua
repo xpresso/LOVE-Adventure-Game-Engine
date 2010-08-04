@@ -558,10 +558,13 @@ function loadSceneryLibrary()
 	sceneryLibrary["Roof V3 R"] = { i = imgScenery, q = gr.newQuad(472+32, 464, 8, 128, tw1, th1), ox = 0, oy = 128, ani = false }
 
 
-	sceneryLibrary["Clock Face"] = { i = imgScenery, q = gr.newQuad(224, 352, 64, 64, tw1, th1), ox = 32, oy = 32, ani = false }
+	sceneryLibrary["Clock Face"] = { i = imgScenery, q = gr.newQuad(224, 352, 48, 50, tw1, th1), ox = 24, oy = 24, ani = false }
 	sceneryLibrary["Clock Hand Minute"] = { i = imgScenery, q = gr.newQuad(224+64, 352, 2, 32, tw1, th1), ox = 1, oy = 4, ani = false }
 	sceneryLibrary["Clock Hand Hour"] = { i = imgScenery, q = gr.newQuad(224+64+2, 352+8, 2, 24, tw1, th1), ox = 1, oy = 4, ani = false }
 	sceneryLibrary["Clock Hand Second"] = { i = imgScenery, q = gr.newQuad(224+64+4, 352, 2, 32, tw1, th1), ox = 1, oy = 4, ani = false }
+
+	sceneryLibrary["Clock Hand Minute Tiny"] = { i = imgScenery, q = gr.newQuad(224+64, 352, 1, 6, tw1, th1), ox = 0, oy = 0, ani = false }
+	sceneryLibrary["Clock Hand Hour Tiny"] = { i = imgScenery, q = gr.newQuad(224+64+2, 352+8, 1, 4, tw1, th1), ox = 0, oy = 0, ani = false }
 
 	for i, l in pairs(sceneryLibrary) do
 		print("Created Scenery Object: \"" .. i .. "\"")

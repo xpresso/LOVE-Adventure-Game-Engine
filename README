@@ -12,8 +12,8 @@ engine creation enviroment blah blah blah. Just download it.
 
 http://love2d.org/
 
-Next, drag the folder these files are in onto the Löve application icon. It will
-run.
+Next, drag the folder these files are in onto the Löve application icon. It
+will run.
 
 Alternatively...
 
@@ -24,5 +24,74 @@ to run.
 If on Windows or OS X or Linux:
 Open this folder (You already have), select everything, at least main.lua and
 the game folder and ZIP the files into an archive. Make sure the main.lua file
-and game folder are at the root of the ZIP. Then rename the .zip with .love. You
-will then be able to double-click to run as well.
+and game folder are at the root of the ZIP. Then rename the .zip with .love.
+You will then be able to double-click to run as well.
+
+
+NOTES:
+
+• Create maps complete with tiles and scenery objects. Scenery objects in the
+  map engine are sorted by Y value. That is to say the higher their Y, i.e. the
+  further down on the map, the closer to the camera, the later they are drawn.
+  So further back scenery gets drawn behind front scenery.
+
+• In the engine, scenery is just one of a few "Y sorted" objects, or "sprites".
+  Along with scenery are NPC's, the player, projectiles, switches, pushables,
+  enemies, explosions, dropped items and anything that is not a tile.
+
+• The map editor, while still pretty newborn, is capable of creating any map
+  the engine can support. There is no limit to how many "sprites" can be placed
+  in a scene. Only the framerate of your computer. But the Löve2d environment
+  is fast enough to support 1000's of drawing calls per frame on any modern
+  computer. Some maps may have hundreds of trees in the same screen at once.
+  There's no problem.
+
+• Currently you can create scenery, but you cannot delete it from the GUI yet.
+  This will be implemented hopefully soon. As a workaround, you can edit the
+  map's "scenery" script manually to remove the misplaced scenery.
+
+• Currently you can only place one of three tile layers and a scenery layer.
+  In the future, the map editor will also be able to create switches,
+  pushables, even enemies. If there is time of course. This map editor is
+  mostly for my own benefit and ease of use. It is here to create the actual
+  game that will eventually come from this project.
+
+• A tip for placing scenery on top of other scenery. Please note: The sorting
+  algorithm is not perfect. If two objects occupy the same Y location, they
+  will overlap, but they will never always be in the same order. So as you play
+  you will notice jittering of the two objects. You can fix this, if you MUST
+  put something in front of something else, and you will have to, a tip is to
+  add a fraction of a pixel, say .01 or so to the Y of the object you want in
+  front. If you want something else, add .02. It doesn't matter. It can even be
+  .0000001 if you want. The sort function will sort them by number. Currently
+  you have to do this in a text editor in post, but in the future I will add a
+  "Nudge" key or a "Send forward" or "Send backward" key to add and subtract
+  these fractions, or decimals.
+
+• Another tip, say you want to create a two story house. You would use the wall
+  scenery twice on top of each other. But you will want to make their Y's the
+  same. Scenery has an "Elevation" parameter that allows you to make scenery
+  "float" in the air. So the wall is 64. One wall would have 0 elevation. The
+  other would have the same Y, but an elevation of -64. To do this, hold LEFT
+  SHIFT and press UP or DOWN to add/subtract from the elevation.
+
+• When a map is created, currently it creates two files. A .MAP file which
+  holds the tile data and a .LUA Scenery file that holds all scenery, the
+  background color and in the future other data. There is another .LUA file
+  that is user created that will allow you to add anything you want. This
+  goes in the /game/maps/post/ folder and will have the same name as the .MAP
+  and .LUA files. Take a look at the POST file for the Courtyard and notice
+  the goodies:
+
+  • Pushables, signs, other conditional statements for adding scenery at
+    certain times, hot zones, etc are all in here.
+
+  • Also note the three functions. mapUpdate, mapDraw, mapUnload. These are
+    used for computing stuff while a map is loaded. Update is called every
+    frame, as is Draw and can calculate and draw new things to the map as you
+    wish, and Unload is called when the map changes. These three functions are
+    completely optional. If they are not present, they won't be used.
+
+
+
+© 2009-2010 Jason Anderson

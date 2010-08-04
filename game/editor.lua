@@ -705,7 +705,7 @@ function editorPressKey(k)
 			if k == "f" then editorFill(1) end
 			if k == "t" then editorTestLevel() end
 
-			if k == "u" then editorLoadMap("undo") end
+			--if k == "u" then editorLoadMap("undo") end
 
 			if k == "1" then editorSwitchLayer(1) end
 			if k == "2" then editorSwitchLayer(2) end
@@ -814,9 +814,7 @@ function editorMouseDown(x,y,button)
 
 	else
 		if editorModeScreen == 1 and button == "l" then
-			if editorCanUndo then
-			  --editorSave("undo")
-			end
+			--if editorCanUndo then editorSave("undo") end
 			if editorCurrentLayer >= 1 and editorCurrentLayer <= 3 then
 				editorPlaceTile()
 			elseif editorCurrentLayer == 4 then
@@ -852,7 +850,7 @@ function editorMouseDown(x,y,button)
 end
 
 function editorFill(editorFillMode)
-	editorSave("undo")
+	--editorSave("undo")
 	local tile = string.sub("0" .. curTileX, -2) .. string.sub("0" .. curTileY, -2)
 	for x=0,250-1 do
 		for y=0,250-1 do
@@ -991,7 +989,7 @@ function editorLoadMap(m)
 
 		editorTilesX = mapWidth / 32
 		editorTilesY = mapHeight / 32
-		if m ~= "undo" then editorSave("undo") end
+		--if m ~= "undo" then editorSave("undo") end
 
 		local mFile = "game/maps/scenery/" .. tostring(m) .. ".lua"
 		if love.filesystem.exists(mFile) then love.filesystem.load(mFile)() end
@@ -1014,7 +1012,7 @@ function editorLoadMap(m)
 
 		editorTilesX = mapWidth / 32
 		editorTilesY = mapHeight / 32
-		editorSave("undo")
+		--editorSave("undo")
 		mapBGColor[1], mapBGColor[2], mapBGColor[3] = 0, 0, 0
 	end
 end
