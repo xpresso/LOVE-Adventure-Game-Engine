@@ -1,6 +1,3 @@
-changeMusic = 4
-mapName = "Forest Inn (Second Floor)"
-
 addPushable(1, 7*32, 3*32, 14, true, "Crate", "")
 addPushable(2, 8*32, 3*32, 14, true, "Crate", "")
 addPushable(3, 9*32, 3*32, 14, true, "Crate", "")
@@ -22,3 +19,6 @@ addPushable(17, 8*32, 11*32, 14, true, "Barrel", "")
 addPushable(18, 9*32, 11*32, 14, true, "Barrel", "")
 
 addPushable(19, 5*32, 2*32, -1, false, "", "warps/stairs_inn_down")
+
+changeMusic = "house_1"
+mapName = "Forest Inn (Second Floor)"

@@ -1,6 +1,3 @@
-changeMusic = 4
-mapName = "Forest Inn (First Floor)"
-
 addPushable(1, 5*32, 10*32, 14, true, "Barrel", "")
 addPushable(2, 5*32, 11*32, 14, true, "Barrel", "")
 addPushable(3, 6*32, 11*32, 14, true, "Barrel", "")
@@ -18,3 +15,6 @@ mapUpdate = function()
 	scenery[10002].r = math.rad(((gameTime.m*(360/60))+180))
 	--scenery[10003].r = math.rad(((gameTime.s)+180))
 end
+
+changeMusic = "house_1"
+mapName = "Forest Inn (First Floor)"

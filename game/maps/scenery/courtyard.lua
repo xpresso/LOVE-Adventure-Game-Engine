@@ -166,7 +166,7 @@ table.insert(scenery, { id = "Tree Fat",  x = 160, y = 376, z = 2, sx = 1, sy = 
 table.insert(scenery, { id = "Tree Fat",  x = 160, y = 40, z = 2, sx = 1, sy = 1, elev = 0} )
 table.insert(scenery, { id = "Tree Fat",  x = 160, y = 504, z = 2, sx = 1, sy = 1, elev = 0} )
 table.insert(scenery, { id = "Tree Fat",  x = 160, y = 672, z = 2, sx = 1, sy = 1, elev = 0} )
-table.insert(scenery, { id = "Tree Fat",  x = 168, y = 552, z = 2, sx = 1, sy = 1, elev = 0} )
+table.insert(scenery, { id = "Tree Fat",  x = 168, y = 553, z = 2, sx = 1, sy = 1, elev = 0} )
 table.insert(scenery, { id = "Tree Fat",  x = 168, y = 801, z = 2, sx = 1, sy = 1, elev = 0} )
 table.insert(scenery, { id = "Tree Fat",  x = 176, y = 128, z = 2, sx = 1, sy = 1, elev = 0} )
 table.insert(scenery, { id = "Tree Fat",  x = 176, y = 210, z = 2, sx = 1, sy = 1, elev = 0} )

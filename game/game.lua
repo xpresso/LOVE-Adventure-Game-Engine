@@ -583,13 +583,15 @@ end
 --LOAD MUSIC AND SOUND EFFECTS
 function loadAudio()
 	muzac = {}
-	muzac[1] = love.audio.newSource("game/audio/music/menu.ogg", "stream")
-	muzac[2] = love.audio.newSource("game/audio/music/intro.ogg", "stream")
-	muzac[3] = love.audio.newSource("game/audio/music/overworld.ogg", "stream")
-	muzac[4] = love.audio.newSource("game/audio/music/house.ogg", "stream")
-	muzac[5] = love.audio.newSource("game/audio/music/forest.ogg", "stream")
-	muzac[6] = love.audio.newSource("game/audio/music/boss.ogg", "stream")
-	muzac[7] = love.audio.newSource("game/audio/music/boss_end.ogg", "stream")
+	muzac["intro"] = love.audio.newSource("game/audio/music/Arcadia.ogg", "stream")
+	muzac["overworld_1"] = love.audio.newSource("game/audio/music/Porch Swing Days - faster.ogg", "stream")
+	muzac["house_1"] = love.audio.newSource("game/audio/music/Cattails.ogg", "stream")
+--	muzac["forest_1"] = love.audio.newSource("game/audio/music/forest.ogg", "stream")
+--	muzac["boss_1"] = love.audio.newSource("game/audio/music/boss.ogg", "stream")
+--	muzac["boss_end"] = love.audio.newSource("game/audio/music/boss_end.ogg", "stream")
+	muzac["arcadia"] = love.audio.newSource("game/audio/music/Arcadia.ogg", "stream")
+	muzac["porch_f"] = love.audio.newSource("game/audio/music/Porch Swing Days - faster.ogg", "stream")
+	muzac["porch_s"] = love.audio.newSource("game/audio/music/Porch Swing Days - slower.ogg", "stream")
 
 	sfx = {}
 	sfx[1] = love.audio.newSource("game/audio/sfx/menu_cursor.ogg", "static")

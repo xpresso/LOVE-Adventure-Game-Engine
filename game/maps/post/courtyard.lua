@@ -23,8 +23,6 @@ table.insert(scenery, 10002, { x = 656, y = 488.03, id = "Clock Hand Minute", z 
 
 weather.sky = 0
 weather.skyRoll = 0
-changeMusic = 3
-mapName = "Forest Inn Courtyard"
 
 mapUpdate = function()
 	scenery[10001].r = math.rad(((gameTime.h*(360/12))+180))
@@ -40,3 +38,6 @@ end
 mapUnload = function()
 	print(">>This is a sample Map Unload callback.\n>>It is called when you leave the map,\n>>i.e. when the next map is loaded.")
 end
+
+changeMusic = "overworld_1"
+mapName = "Forest Inn Courtyard"
