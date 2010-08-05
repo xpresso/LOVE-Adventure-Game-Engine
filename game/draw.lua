@@ -6,8 +6,8 @@ function drawMapComposite(dt)
 		drawLowerLayer()
 
 		for i,s in pairs(sprites) do
-			if s.x > xBounds[0]*32-128 and s.x < xBounds[1]*32+128 and s.y > yBounds[0]*32-128 and s.y < yBounds[1]*32+128 then
-				local elev = s.elev or 0
+  		local elev = s.elev or 0
+			--if s.x > xBounds[0]*32-128 and s.x < xBounds[1]*32+128 and s.y > yBounds[0]*32-512 and s.y < yBounds[1]*32+128 then
 				local sl = sceneryLibrary[s.id]
 				if s.n == "Scenery" then
 					gr.setColor(255,0,0)
@@ -98,7 +98,7 @@ function drawMapComposite(dt)
 					gr.rectangle("line", s.x+mapOffsetX, s.y+mapOffsetY-32, 32, 32)
 				end
 				if debugVar == 2 then gr.print(tostring(s.n), _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))) end --DEBUG CODE
-			end
+			--end
 		end
 
 		mapDraw()
@@ -378,6 +378,7 @@ function drawDebug(dt)
 			scriptData = scriptData .. " Current:        " .. currentScript .. "\n"
 			scriptData = scriptData .. " Paused:         " .. tostring(scriptPaused) .. "\n"
 			scriptData = scriptData .. " Waiting:        " .. tostring(scriptWaiting) .. "\n"
+			scriptData = scriptData .. " Wait For Cam:   " .. tostring(scriptWaitingForCamera) .. "\n"
 			scriptData = scriptData .. " npcIsMoving:    " .. tostring(npcIsMoving) .. "\n"
 			scriptData = scriptData .. " npcMoveSteps:   " .. tostring(npcMoveSteps) .. "\n"
 			if objIsMoving > 0 then

@@ -10,6 +10,7 @@ function loadScript(s)
 		scriptLength = table.getn(script) + 1
 		scriptRunning = true
 		scriptLine = 1
+		scriptWaitingForCamera = false
 	else
 		error("Oops! It seems you are missing a certain script file.\nThe script \"" .. mFile .. "\" seems to be missing from its home.\nThis is not good since the game has no direction in life and must now end.")
 	end
@@ -20,6 +21,16 @@ end
 --Do all the Script processing.
 function runScript(dt)
 	if npcIsMoving > 0 then moveNPC(dt) end
+
+	if scriptWaitingForCamera == true then
+	  if camera.movingX == true or camera.movingY == true then
+	    scriptPaused = true
+	  else
+	    scriptWaitingForCamera = false
+	    scriptPaused = false
+			script[scriptLine].d = true
+	  end
+	end
 
 	if scriptWaiting == true then
 		if time > scriptWaitTime + scriptWaitSeconds then
@@ -32,12 +43,13 @@ function runScript(dt)
 	end
 
 	if scriptPaused == false and scriptRunning == true then
-		if scriptLine < scriptLength and script[scriptLine].d == false then
+		if scriptLine < scriptLength and (script[scriptLine].d == false or script[scriptLine].d == nil) then
 			local l = script[scriptLine].c
-			local p1 = script[scriptLine].p1
-			local p2 = script[scriptLine].p2
-			local p3 = script[scriptLine].p3
-			local p4 = script[scriptLine].p4
+			local p1 = script[scriptLine].p1 or nil
+			local p2 = script[scriptLine].p2 or nil
+			local p3 = script[scriptLine].p3 or nil
+			local p4 = script[scriptLine].p4 or nil
+			local p5 = script[scriptLine].p5 or nil
 			if l == "DIALOG" then
 				dialogWhoSaid = p1
 				setDialogText(p2)
@@ -122,11 +134,14 @@ function runScript(dt)
 				if p1 == "PLAYER" then
 					lockCamera(0,p4,player.x,player.y)
 				elseif p1 == "COORDS" then
-					lockCamera(mode,p4,p2,p3)
+					lockCamera(1,p4,p2,p3)
 				end
 				script[scriptLine].d = true
-			elseif l == "WAITFORCAMERA" then
+			elseif l == "MOVECAMERA" then
+			  setCamera(p1, p2)
 				script[scriptLine].d = true
+			elseif l == "WAITFORCAMERA" then
+				scriptWaitingForCamera = true
 			elseif l == "DEACTIVATEHOTZONE" then
 				hotzone[p1].active = false
 				script[scriptLine].d = true
@@ -143,6 +158,9 @@ function runScript(dt)
 			elseif l == "CHANGEPUSHABLEIMG" then
 				if p3 > 0 then playSound(p3) end
 				pushables[p1].img = p2
+				script[scriptLine].d = true
+			elseif l == "SETMUSIC" then
+        setMusic(p1)
 				script[scriptLine].d = true
 			elseif l == "SETWEATHER" then
 				setWeather(p1, p2, p3)
@@ -165,6 +183,13 @@ function runScript(dt)
 				script[scriptLine].d = true
 			elseif l == "SOMETHINGTOSAY" then
 				npc[p1].somethingToSay = p2
+				script[scriptLine].d = true
+			elseif l == "WALKUPSTAIRS" then
+				script[scriptLine].d = true
+			elseif l == "WALKDOWNSTAIRS" then
+				script[scriptLine].d = true
+			elseif l == "SETFLAG" then
+        gameFlag[p1] = p2
 				script[scriptLine].d = true
 			else
 				--Invalid Script Command / Ignore instead of freeze in an infinite loop
@@ -239,7 +264,7 @@ end
 function drawDialog(dt)
 	if dialog.opened == true then
 		gr.setColorMode("modulate")
-		if dialogWhoSaid == 0 then
+		if dialogWhoSaid <= 0 then
 			gr.setColor(0,0,0,127)
 			gr.rectangle("fill", 0, dialog.y, screenW, dialog.h)
 		else
@@ -270,9 +295,9 @@ function drawDialog(dt)
 		m = string.sub(dialog.text, 1, dialog.cursor)
 		m2 = string.sub(dialog.text, 1, dialog.cursor+1)
 		gr.setFont(dialogFont)
-		if dialogWhoSaid == 0 then gr.setColor(255,255,255,50) else gr.setColor(0,0,0,50) end
+		if dialogWhoSaid <= 0 then gr.setColor(255,255,255,50) else gr.setColor(0,0,0,50) end
 		gr.printf(m2, dialog.x + 32, dialog.y + 35, dialog.w-64, "left")
-		if dialogWhoSaid == 0 then gr.setColor(255,255,255,255) else gr.setColor(0,0,0,255) end
+		if dialogWhoSaid <= 0 then gr.setColor(255,255,255,255) else gr.setColor(0,0,0,255) end
 		gr.printf(m, dialog.x + 32, dialog.y + 34, dialog.w-64, "left")
 
 		if dialog.cursor < string.len(dialog.text) then

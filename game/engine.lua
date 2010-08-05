@@ -7,6 +7,8 @@ function love.load()
 	debugConsole = false
 	debugConsoleText = ""
 
+	currentMusic = ""
+
 	testMode = false
 
 	time = ti.getTime()
@@ -667,7 +669,7 @@ function love.keypressed(k)
 					elseif k == "right" then
 						if menu.selectionB == 1 then
 							musicOn = true
-							setMusic(1, true)
+							setMusic(-1, true)
 						elseif menu.selectionB == 2 then
 							soundOn = true
 						elseif menu.selectionB == 3 then
@@ -707,7 +709,7 @@ function love.keypressed(k)
 							menu.spacing = 0
 						end
 						love.audio.setVolume(soundVolume/10)
-						setMusic(1, true)
+						setMusic(-1, true)
 						playSound(2)
 					end
 				elseif menu.page == mpQuit then
@@ -1150,10 +1152,14 @@ function animateMenu(dt)
 end
 
 function setMusic(m,l)
-	if musicOn and enableAudio then
+  if m == -1 then m = currentMusic end
+	if musicOn and enableAudio and m ~= 0 and currentMusic ~= m then
+	  love.audio.stop()
 		love.audio.play(muzac[m])
 		muzac[m]:setLooping(l)
 	end
+	if m == 0 then love.audio.stop() end
+	currentMusic = m
 end
 
 function playSound(s)

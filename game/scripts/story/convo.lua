@@ -1,7 +1,7 @@
 --THE CUTSCENE CONVERSATION SCRIPT (RUNS ONLY ONCE)
 if gameFlag[1] ~= 1 then --If the conversation has not taken place...
 	table.insert(script, {c = "CUTSCENE", p1 = "IN", p2 = nil, p3 = nil, p4 = nil, d = false})
-	table.insert(script, {c = "SCROLLLOCK", p1 = "COORDS", p2 = 27*32, p3 = 16*32, p4 = 1, d = false})
+	table.insert(script, {c = "SCROLLLOCK", p1 = "COORDS", p2 = 27*32, p3 = 38*32, p4 = 512, d = false})
 	table.insert(script, {c = "MOVENPC", p1 = 1, p2 = "L", p3 = 12, p4 = nil, d = false})
 	table.insert(script, {c = "MOVENPC", p1 = 1, p2 = "D", p3 = 1, p4 = nil, d = false})
 	table.insert(script, {c = "DIALOG", p1 = 1, p2 = "Hope I wasn't spotted...", p3 = 1, p4 = nil, d = false})
@@ -12,7 +12,7 @@ if gameFlag[1] ~= 1 then --If the conversation has not taken place...
 	table.insert(script, {c = "DIALOG", p1 = 2, p2 = "Where were you just now??!!", p3 = 2, p4 = nil, d = false})
 	table.insert(script, {c = "MOVENPC", p1 = 2, p2 = "U", p3 = 1, p4 = nil, d = false})
 	table.insert(script, {c = "MOVENPC", p1 = 2, p2 = "L", p3 = 1, p4 = nil, d = false})
-	table.insert(script, {c = "SCROLLLOCK", p1 = "COORDS", p2 = 29*32, p3 = 16*32, p4 = .33, d = false})
+	table.insert(script, {c = "SCROLLLOCK", p1 = "COORDS", p2 = 29*32, p3 = 38*32, p4 = 64, d = false})
 	table.insert(script, {c = "DIALOG", p1 = 2, p2 = "I thought you said I could come with you!", p3 = 2, p4 = nil, d = false})
 	table.insert(script, {c = "DIALOG", p1 = 1, p2 = "You were no where to be found!\nI looked all over.", p3 = 1, p4 = nil, d = false})
 	table.insert(script, {c = "FACENPC", p1 = 2, p2 = "R", p3 = nil, p4 = nil, d = false})
@@ -39,7 +39,7 @@ if gameFlag[1] ~= 1 then --If the conversation has not taken place...
 	table.insert(script, {c = "WAIT", p1 = .25, p2 = nil, p3 = nil, p4 = nil, d = false})
 	table.insert(script, {c = "CHANGEPUSHABLEIMG", p1 = 2, p2 = "Door Closed 1", p3 = 81, p4 = nil, d = false})
 	table.insert(script, {c = "FACENPC", p1 = 1, p2 = "R", p3 = nil, p4 = nil, d = false})
-	table.insert(script, {c = "SCROLLLOCK", p1 = "PLAYER", p2 = nil, p3 = nil, p4 = 1, d = false})
+	table.insert(script, {c = "SCROLLLOCK", p1 = "PLAYER", p2 = nil, p3 = nil, p4 = 512, d = false})
 	table.insert(script, {c = "CUTSCENE", p1 = "OUT", p2 = nil, p3 = nil, p4 = nil, d = false})
 	table.insert(script, {c = "WAIT", p1 = 1, p2 = nil, p3 = nil, p4 = nil, d = false})
 end

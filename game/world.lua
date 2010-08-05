@@ -710,22 +710,39 @@ function lockCamera(mode,t,a1,a2)
 	camera.movingY = true
 	camera.time = t * 1000
 	if camera.scrollFromX > camera.scrollToX then
-		camera.speedX = camera.scrollFromX - camera.scrollToX
+		camera.speedX = t--(camera.scrollFromX - camera.scrollToX) * t
 	elseif camera.scrollFromX < camera.scrollToX then
-		camera.speedX = camera.scrollToX - camera.scrollFromX
+		camera.speedX = t--(camera.scrollToX - camera.scrollFromX) * t
 	else
 		camera.speedX = 0
 		camera.movingX = false
 	end
 	if camera.scrollFromY > camera.scrollToY then
-		camera.speedY = camera.scrollFromY - camera.scrollToY
+		camera.speedY = t--(camera.scrollFromY - camera.scrollToY) * t
 	elseif camera.scrollFromY < camera.scrollToY then
-		camera.speedY = camera.scrollToY - camera.scrollFromY
+		camera.speedY = t--(camera.scrollToY - camera.scrollFromY) * t
 	else
 		camera.speedY = 0
 		camera.movingY = false
 	end
 	camera.locked = mode
+	print("Camera Speed:", camera.speedX, camera.speedY)
+end
+
+function setCamera(x,y)
+  if x < screenW/2 then x = screenW/2 end
+  if y < screenH/2 then y = screenH/2 end
+  if x > mapWidth-screenW/2 then x = mapWidth-screenW/2 end
+  if y > mapHeight-screenH/2 then y = mapHeight-screenH/2 end
+  camera.scrollFromX = x
+  camera.scrollFromY = y
+  camera.scrollToX = x
+  camera.scrollToY = y
+  camera.x = x
+  camera.y = y
+  camera.movingX = false
+  camera.movingY = false
+  camera.locked = 1
 end
 
 function panCamera(dt)

@@ -8,6 +8,10 @@ function loadFonts()
 	editorFont = gr.newFont("game/images/fonts/Vollkorn.ttf", 22)
 	editorFontMono = gr.newFont("game/images/fonts/Andale Mono.ttf", 14)
 	editorFontMono:setLineHeight(.9)
+
+	creditFontA = gr.newFont("game/images/fonts/Vollkorn.ttf", 48)
+	creditFontB = gr.newFont("game/images/fonts/Vollkorn.ttf", 56)
+
 	dialogFont = gr.newFont("game/images/fonts/Vollkorn.ttf", 22)
 	dialogFont:setLineHeight(1.2)
 	numbers = gr.newImageFont("game/images/fonts/numbers.png", " 0123456789.,$KAB")
@@ -118,16 +122,6 @@ function loadImages()
 end
 
 function filterImages()
-	npcs:setFilter("nearest","nearest")
-	playerImg:setFilter("nearest","nearest")
-	enemies:setFilter("nearest","nearest")
-	enemies2:setFilter("nearest","nearest")
-	menuTitle:setFilter("linear","linear")
-	imgScenery:setFilter("nearest","nearest")
-	projectiles:setFilter("nearest","nearest")
-	explosions:setFilter("nearest","nearest")
-	dropItem:setFilter("nearest","nearest")
-	rain:setFilter("nearest","nearest")
 end
 
 function buildInventory()
@@ -286,6 +280,7 @@ function resetGameVars(testing)
 	scriptWaiting = false
 	scriptWaitTime = 0
 	scriptWaitSeconds = 0
+	scriptWaitingForCamera = false
 	chainScript = ""
 
 	currentMusic = 0
@@ -295,8 +290,8 @@ function resetGameVars(testing)
 
 	player = {
 		name = tmpName,
-		x = 12*32,
-		y = 3*32,
+		x = 8*32,
+		y = 40*32,
 		cx = 0,
 		cy = 0,
 		oldXY = 0,
@@ -369,9 +364,9 @@ end
 
 function loadNPCs()
 	npc = {}
-	addNPC(1, "courtyard", 39*32, 16*32, "Kristen", 2, 4, false, "npcs/npc_kristen")
-	addNPC(2, "courtyard", 34*32, 19*32, "Zooey", 3, 4, false, "npcs/npc_zooey")
-	addNPC(3, "courtyard", 25*32, 15*32, "Guard", 4, 4, false, "npcs/npc_guard")
+	addNPC(1, "courtyard", 39*32, 38*32, "Kristen", 2, 4, false, "npcs/npc_kristen")
+	addNPC(2, "courtyard", 34*32, 41*32, "Zooey", 3, 4, false, "npcs/npc_zooey")
+	addNPC(3, "courtyard", 25*32, 37*32, "Guard", 4, 4, false, "npcs/npc_guard")
 	addNPC(4, "inn_firstfloor", 6*32, 4*32, "Inn Keeper", 5, 4, false, "npcs/npc_innkeeper")
 	addNPC(5, "inn_firstfloor", 17*32, 6*32, "Bar Keeper", 1, 4, false, "npcs/npc_barkeeper")
 	addNPC(6, "inn_secondfloor", 18*32, 4*32, "Julie", 6, 4, false, "npcs/npc_julie")
@@ -381,8 +376,8 @@ end
 
 function loadSwitches()
 	switch = {}
-	addSwitch(1, "courtyard", 24*32, 16*32, 1, "Sign", "Sign", 1, "switches/sign", 0, 32)
-	addSwitch(2, "courtyard", 35*32, 13*32, 1, "Sign", "Sign", 1, "switches/sign2", 0, 32)
+	addSwitch(1, "courtyard", 24*32, 38*32, 1, "Sign", "Sign", 1, "switches/sign", 0, 32)
+	addSwitch(2, "courtyard", 35*32, 35*32, 1, "Sign", "Sign", 1, "switches/sign2", 0, 32)
 	addSwitch(3, "shed", 12*32, 6*32, 0, "Chest Opened", "Chest Closed", 1, "switches/chest", 0, 32)
 end
 
@@ -558,13 +553,17 @@ function loadSceneryLibrary()
 	sceneryLibrary["Roof V3 R"] = { i = imgScenery, q = gr.newQuad(472+32, 464, 8, 128, tw1, th1), ox = 0, oy = 128, ani = false }
 
 
-	sceneryLibrary["Clock Face"] = { i = imgScenery, q = gr.newQuad(224, 352, 48, 50, tw1, th1), ox = 24, oy = 24, ani = false }
-	sceneryLibrary["Clock Hand Minute"] = { i = imgScenery, q = gr.newQuad(224+64, 352, 2, 32, tw1, th1), ox = 1, oy = 4, ani = false }
-	sceneryLibrary["Clock Hand Hour"] = { i = imgScenery, q = gr.newQuad(224+64+2, 352+8, 2, 24, tw1, th1), ox = 1, oy = 4, ani = false }
-	sceneryLibrary["Clock Hand Second"] = { i = imgScenery, q = gr.newQuad(224+64+4, 352, 2, 32, tw1, th1), ox = 1, oy = 4, ani = false }
+	sceneryLibrary["Clock Face"] = { i = imgScenery, q = gr.newQuad(224-32, 352, 48, 50, tw1, th1), ox = 24, oy = 24, ani = false }
+	sceneryLibrary["Clock Hand Minute"] = { i = imgScenery, q = gr.newQuad(224+64-48, 352, 2, 32, tw1, th1), ox = 1, oy = 4, ani = false }
+	sceneryLibrary["Clock Hand Hour"] = { i = imgScenery, q = gr.newQuad(224+64+2-48, 352+8, 2, 24, tw1, th1), ox = 1, oy = 4, ani = false }
+	sceneryLibrary["Clock Hand Second"] = { i = imgScenery, q = gr.newQuad(224+64+4-48, 352, 2, 32, tw1, th1), ox = 1, oy = 4, ani = false }
 
-	sceneryLibrary["Clock Hand Minute Tiny"] = { i = imgScenery, q = gr.newQuad(224+64, 352, 1, 6, tw1, th1), ox = 0, oy = 0, ani = false }
-	sceneryLibrary["Clock Hand Hour Tiny"] = { i = imgScenery, q = gr.newQuad(224+64+2, 352+8, 1, 4, tw1, th1), ox = 0, oy = 0, ani = false }
+	sceneryLibrary["Clock Hand Minute Tiny"] = { i = imgScenery, q = gr.newQuad(224+64-48, 352, 1, 6, tw1, th1), ox = 0, oy = 0, ani = false }
+	sceneryLibrary["Clock Hand Hour Tiny"] = { i = imgScenery, q = gr.newQuad(224+64+2-48, 352+8, 1, 4, tw1, th1), ox = 0, oy = 0, ani = false }
+
+	sceneryLibrary["Distant Cloud"] = { i = imgScenery, q = gr.newQuad(208, 448, 112, 48, tw1, th1), ox = 56, oy = 24, ani = false }
+	sceneryLibrary["Sun"] = { i = imgScenery, q = gr.newQuad(256, 160, 80, 80, tw1, th1), ox = 40, oy = 40, ani = false }
+
 
 	for i, l in pairs(sceneryLibrary) do
 		print("Created Scenery Object: \"" .. i .. "\"")
@@ -585,6 +584,7 @@ function loadAudio()
 	muzac = {}
 	muzac["intro"] = love.audio.newSource("game/audio/music/Arcadia.ogg", "stream")
 	muzac["overworld_1"] = love.audio.newSource("game/audio/music/Porch Swing Days - faster.ogg", "stream")
+	muzac["town_1"] = love.audio.newSource("game/audio/music/Thatched Villagers.ogg", "stream")
 	muzac["house_1"] = love.audio.newSource("game/audio/music/Cattails.ogg", "stream")
 --	muzac["forest_1"] = love.audio.newSource("game/audio/music/forest.ogg", "stream")
 --	muzac["boss_1"] = love.audio.newSource("game/audio/music/boss.ogg", "stream")
