@@ -584,10 +584,9 @@ function loadAudio()
 	muzac = {}
 	muzac["intro"] = love.audio.newSource("game/audio/music/Arcadia.ogg", "stream")
 	muzac["overworld_1"] = love.audio.newSource("game/audio/music/Porch Swing Days - faster.ogg", "stream")
+	muzac["overworld_2"] = love.audio.newSource("game/audio/music/Porch Swing Days - slower.ogg", "stream")
 	muzac["town_1"] = love.audio.newSource("game/audio/music/Thatched Villagers.ogg", "stream")
 	muzac["house_1"] = love.audio.newSource("game/audio/music/Cattails.ogg", "stream")
-	muzac["porch_f"] = love.audio.newSource("game/audio/music/Porch Swing Days - faster.ogg", "stream")
-	muzac["porch_s"] = love.audio.newSource("game/audio/music/Porch Swing Days - slower.ogg", "stream")
 
 	sfx = {}
 	sfx[1] = love.audio.newSource("game/audio/sfx/menu_cursor.ogg", "static")
