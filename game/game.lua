@@ -10,7 +10,7 @@ function loadFonts()
 	editorFontMono:setLineHeight(.9)
 
 	creditFontA = gr.newFont("game/images/fonts/Vollkorn.ttf", 48)
-	creditFontB = gr.newFont("game/images/fonts/Vollkorn.ttf", 56)
+	creditFontB = gr.newFont("game/images/fonts/Vollkorn.ttf", 72)
 
 	dialogFont = gr.newFont("game/images/fonts/Vollkorn.ttf", 22)
 	dialogFont:setLineHeight(1.2)

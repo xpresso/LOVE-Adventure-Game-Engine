@@ -87,6 +87,13 @@ mapDraw = function()
     end
     if _f(gameSession) == 22 then tempText.to = 0 end
 
+    if _f(gameSession) == 23 then
+      tempText.to = 255
+      tempText.t = "Adventure Game!"
+      tempText.f = creditFontB
+    end
+    if _f(gameSession) == 30 then tempText.to = 0 end
+
     if tempText.val > 0 then
       gr.setBlendMode("alpha")
       gr.setColorMode("modulate")

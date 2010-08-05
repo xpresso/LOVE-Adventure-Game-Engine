@@ -4,6 +4,7 @@ require( "game/draw.lua" )
 require( "game/world.lua" )
 require( "game/scripting.lua" )
 require( "game/editor.lua" )
+love.filesystem.setIdentity("Adventure")
 
 _r = math.random
 _f = math.floor

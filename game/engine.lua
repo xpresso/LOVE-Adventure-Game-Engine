@@ -26,7 +26,7 @@ function love.load()
 	if love.filesystem.exists("settings.lua") then
 		love.filesystem.load("settings.lua")()
 	else
-		musicOn = false
+		musicOn = true
 		soundOn = true
 		soundVolume = 10
 		createSettings()
@@ -1176,7 +1176,6 @@ function createConfiguration(sw, sh)
 	data = data .. "	t.console = true\n"
 	data = data .. "	t.version = 0.6\n"
 	data = data .. "	t.screen.vsync = true\n"
-	data = data .. "	t.screen.fsaa = 4\n"
 	data = data .. "	t.modules.joystick = false\n"
 	data = data .. "	t.modules.audio = true\n"
 	data = data .. "	t.modules.keyboard = true\n"
