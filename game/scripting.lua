@@ -20,7 +20,7 @@ end
 
 --Do all the Script processing.
 function runScript(dt)
-	if npcIsMoving > 0 then moveNPC(dt) end
+	if actorIsMoving > -1 then moveActor(dt) end
 
 	if scriptWaitingForCamera == true then
 	  if camera.movingX == true or camera.movingY == true then
@@ -79,6 +79,10 @@ function runScript(dt)
 				player.x = tonumber(p1) * 32
 				player.y = tonumber(p2) * 32
 				script[scriptLine].d = true
+			elseif l == "MOVEPLAYER" then
+				actorIsMoving = 0
+				actorMoveSteps = 32 * tonumber(p2)
+				actorMoveDirection = p1
 			elseif l == "CHANGEMAP" then
 				fade.to = 255
 				if fade.val >= 255 then
@@ -100,9 +104,9 @@ function runScript(dt)
 						if mapHit[x][y] == "n" then mapHit[x][y] = "." end
 					end
 				end
-				npcIsMoving = tonumber(p1)
-				npcMoveSteps = 32 * tonumber(p3)
-				npcMoveDirection = p2
+				actorIsMoving = tonumber(p1)
+				actorMoveSteps = 32 * tonumber(p3)
+				actorMoveDirection = p2
 			elseif l == "FACENPC" then
 				if p2 == "L" then
 					npc[p1].facing = 1
@@ -233,17 +237,17 @@ function openDialog()
 
 	local spaceAbove, spaceBelow, horizOffset
 	if dialogWhoSaid > 0 then
-		spaceAbove = npc[dialogWhoSaid].y + mapOffsetY - 50 + camera.shakeX
-		spaceBelow = screenH - (npc[dialogWhoSaid].y + mapOffsetY) - 50 -- + camera.shakeY
+		spaceAbove = npc[dialogWhoSaid].y + mapOffsetY - 60 + camera.shakeX
+		spaceBelow = screenH - (npc[dialogWhoSaid].y + mapOffsetY) - 60 -- + camera.shakeY
 		horizOffset = npc[dialogWhoSaid].x + mapOffsetX
 	else
-		spaceAbove = player.y + mapOffsetY - 50
+		spaceAbove = player.y + mapOffsetY - 60
 		spaceBelow = screenH - spaceAbove - 50
 		horizOffset = 0
 	end
 	dialog.w = 640-64
 
-	if spaceAbove < 128+32 then
+	if spaceAbove < 180 then
 		dialog.location = 1
 		dialog.y = screenH - 160
 	else
@@ -256,6 +260,8 @@ function openDialog()
 	else
 		dialog.x = screenW - dialog.w - 32
 	end
+
+	print(spaceAbove)
 
 	playSound(998)
 end
@@ -345,36 +351,63 @@ function facePlayer(d)
 end
 
 --When the script calls for an NPC to be moved, this does the moving.
-function moveNPC(dt)
-	if npcIsMoving > 0 then
-		npc[npcIsMoving].walking = true
+function moveActor(dt)
+  if actorIsMoving == 0 then
+    player.moving = true
 		scriptPaused = true
-		if npcMoveSteps > 0 then
-			if npcMoveDirection == "L" then
-				npc[npcIsMoving].x = npc[npcIsMoving].x - 4
-				npc[npcIsMoving].facing = 1
-			elseif npcMoveDirection == "U" then
-				npc[npcIsMoving].y = npc[npcIsMoving].y - 4
-				npc[npcIsMoving].facing = 2
-			elseif npcMoveDirection == "R" then
-				npc[npcIsMoving].x = npc[npcIsMoving].x + 4
-				npc[npcIsMoving].facing = 3
-			elseif npcMoveDirection == "D" then
-				npc[npcIsMoving].y = npc[npcIsMoving].y + 4
-				npc[npcIsMoving].facing = 4
+		if actorMoveSteps > 0 then
+			if actorMoveDirection == "L" then
+				player.x = player.x - 2
+				player.facing = 1
+			elseif actorMoveDirection == "U" then
+				player.y = player.y - 2
+				player.facing = 2
+			elseif actorMoveDirection == "R" then
+				player.x = player.x + 2
+				player.facing = 3
+			elseif actorMoveDirection == "D" then
+				player.y = player.y + 2
+				player.facing = 4
 			end
-			npcMoveSteps = npcMoveSteps - 4
-			npc[npcIsMoving].step = npc[npcIsMoving].step + 2
-			if npc[npcIsMoving].step >= 32 then npc[npcIsMoving].step = 0 end
+			actorMoveSteps = actorMoveSteps - 2
+			player.walking = player.walking + 1
+			if player.walking >= 32 then player.walking = 0 end
 		else
-			npc[npcIsMoving].x = _f(npc[npcIsMoving].x)
-			npc[npcIsMoving].y = _f(npc[npcIsMoving].y)
-			npc[npcIsMoving].walking = false
-			npc[npcIsMoving].step = 0
-			npcIsMoving = 0
+			player.x = _f(player.x)
+			player.y = _f(player.y)
+			player.moving = false
+			player.walking = 0
+			actorIsMoving = -1
+		end
+	elseif actorIsMoving > 0 then
+		npc[actorIsMoving].walking = true
+		scriptPaused = true
+		if actorMoveSteps > 0 then
+			if actorMoveDirection == "L" then
+				npc[actorIsMoving].x = npc[actorIsMoving].x - 4
+				npc[actorIsMoving].facing = 1
+			elseif actorMoveDirection == "U" then
+				npc[actorIsMoving].y = npc[actorIsMoving].y - 4
+				npc[actorIsMoving].facing = 2
+			elseif actorMoveDirection == "R" then
+				npc[actorIsMoving].x = npc[actorIsMoving].x + 4
+				npc[actorIsMoving].facing = 3
+			elseif actorMoveDirection == "D" then
+				npc[actorIsMoving].y = npc[actorIsMoving].y + 4
+				npc[actorIsMoving].facing = 4
+			end
+			actorMoveSteps = actorMoveSteps - 4
+			npc[actorIsMoving].step = npc[actorIsMoving].step + 2
+			if npc[actorIsMoving].step >= 32 then npc[actorIsMoving].step = 0 end
+		else
+			npc[actorIsMoving].x = _f(npc[actorIsMoving].x)
+			npc[actorIsMoving].y = _f(npc[actorIsMoving].y)
+			npc[actorIsMoving].walking = false
+			npc[actorIsMoving].step = 0
+			actorIsMoving = -1
 		end
 	end
-	if npcIsMoving == 0 then
+	if actorIsMoving == -1 then
 		updateNPCs()
 		scriptPaused = false
 		script[scriptLine].d = true

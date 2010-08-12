@@ -1,104 +1,111 @@
 function drawMapComposite(dt)
 	debugTilesDrawn = 0
 	debugSceneryDrawn = 0
-	gr.setColorMode("replace")
 	if fade.val < 255 then
 		drawLowerLayer()
 
 		for i,s in pairs(sprites) do
+      gr.setColorMode("modulate")
+      gr.setBlendMode("alpha")
+      gr.setColor(255,255,255)
   		local elev = s.elev or 0
-			--if s.x > xBounds[0]*32-128 and s.x < xBounds[1]*32+128 and s.y > yBounds[0]*32-512 and s.y < yBounds[1]*32+128 then
-				local sl = sceneryLibrary[s.id]
-				if s.n == "Scenery" then
-					gr.setColor(255,0,0)
-					i = sceneryLibrary[s.id].i
-					q = sceneryLibrary[s.id].q
-					if s.r ~= nil then r = s.r else r = 0 end
+      local sl = sceneryLibrary[s.id]
+      if s.n == "Scenery" then
+        i = sceneryLibrary[s.id].i
+        q = sceneryLibrary[s.id].q
+        if s.r ~= nil then r = s.r else r = 0 end
 
-					local x, y = _f(s.x+mapOffsetX), _f(s.y+mapOffsetY)
-					if sceneryLibrary[s.id].ani == true then
-						if s.fra == nil then s.fra = math.random(1, sl.fra) end
-						if s.sp == nil then s.sp = 1 end
-						if s.active then s.fra = s.fra + dt * s.sp end
-						if s.fra >= sl.fra+1 then s.fra = 1 end
-						gr.drawq(sl.i, sl.q[_f(s.fra)], x, y, r, s.sx, s.sy, sl.ox, sl.oy - elev)
-					else
-						gr.drawq(sl.i, sl.q, x, y + elev, r, s.sx, s.sy, sl.ox, sl.oy)
-					end
-					debugSceneryDrawn = debugSceneryDrawn + 1
-				elseif s.n == "Switch" then
-					local sce
-					if s.state == 1 then sce = s.imgOn else sce = s.imgOff end
-					if sce == nil then sce = "Barrel" end
-					sl = sceneryLibrary[sce]
-					local x, y = s.x+mapOffsetX+sl.ox, s.y+mapOffsetY+sl.oy
-					gr.drawq(sl.i, sl.q, x, y, 0, 1, 1, sl.ox, sl.oy)
-				elseif s.n == "Pushable" then
-					sl = sceneryLibrary[s.img]
-					local x, y = s.x+mapOffsetX, s.y+mapOffsetY
-					gr.drawq(sl.i, sl.q, x, y, 0, 1, 1, sl.ox, sl.oy)
-				elseif s.n == "Enemy" then
-					local sy, eof, px, py
-					gr.setBlendMode("alpha")
-					if s.inv > 0 then
-						gr.setColor(255,255,255,100)
-					else
-						gr.setColor(255,255,255,255)
-					end
-					if s.simple == false then
-						eof = (s.t - 1) * 64 + (_f(s.step/2) * 32)
-						gr.drawq(enemies, enemyGrid[s.facing - 1][eof/32], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))-32)
-					else
-						gr.drawq(enemies2, enemy2Grid[_f(s.step/2)], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))-32)
-					end
-				elseif s.n == "NPC" then
-					if s.map == mapNumber then
-						local sy = ((_f(s.step/16)) + ((s.who - 1) * 2))
-						gr.drawq(npcs, npcGrid[s.facing-1][sy], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY)), 0, 1, 1, 0, 48)
-						if s.somethingToSay == true then
-							gr.drawq(menuTitle, notifGrid[3], s.x + mapOffsetX+16, s.y + mapOffsetY - 8 + _s(time*5)*3, 0, 1, 1, 16, 48)
-						end
-					end
-				elseif s.n == "Player" then
-					--Draw the Player
-					if player.invAnim == 0 then
-						local px = (_f((player.x+mapOffsetX)))
-						local py = (_f((player.y+mapOffsetY)))
-						if player.attacking > 0 then
-							--Draw the player attack pose
-							gr.drawq(playerImg, playerGrid[player.facing - 1][4], px, py, 0, 1, 1, 32, 64)
-						else
-							--Regular walking player
-							gr.drawq(playerImg, playerGrid[player.facing - 1][_f(player.walking/8)], px, py, 0, 1, 1, 32, 64)
-						end
-					end
-				elseif s.n == "TargetArrow" then
-					local a = notifGrid[1]
-					if player.targetDist < 96 then a = notifGrid[2] end
-					gr.drawq(menuTitle, a, s.x, s.y, 0, 1, 1, 16, 32)
-				elseif s.n == "Dropped" then
-					local drawIt = true
-					if s.life <= 3 then if _f(time % 10)/10 == 1 then drawIt = false end end
-					if drawIt == true then
-						gr.setColor(0,0,0,255/2)
-						gr.rectangle("fill",(s.x + mapOffsetX)+8-s.f/2, (s.y + mapOffsetY-2),16+(s.f),2)
-						gr.drawq(dropItem, itemGrid[s.id], (s.x + mapOffsetX), (s.y + mapOffsetY+s.f-5)-32)
-					end
-				elseif s.n == "Projectile" then
-					r = _d2r(s.r * 90 + s.spin)
-					if s.time > 0 or s.ty ~= 2 then gr.drawq(projectiles, projectileGrid[s.ty][0], _f(s.x + mapOffsetX+16), _f(s.y + mapOffsetY-16), r, 1, 1, 16, 16) end
-				elseif s.n == "Boomerang" then
-					gr.drawq(projectiles, projectileGrid[3][0], _f(s.x+mapOffsetX), _f(s.y+mapOffsetY), s.boomSpin, 1, 1, 16, 16)
-				elseif s.n == "Explosion" then
-					gr.drawq(explosions, explosionGrid[_f(s.f)][0], _f(s.x + mapOffsetX)+16, _f(s.y + mapOffsetY)-(s.f*2)+16, s.f, 1+s.f/2, 1+s.f/2, 16, 16)
-				else
-					gr.setColor(0,0,255)
-					gr.rectangle("fill", s.x+mapOffsetX, s.y+mapOffsetY-32, 32, 32)
-					gr.setColor(0,0,0)
-					gr.rectangle("line", s.x+mapOffsetX, s.y+mapOffsetY-32, 32, 32)
-				end
-				if debugVar == 2 then gr.print(tostring(s.n), _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))) end --DEBUG CODE
-			--end
+        local x, y = _f(s.x+mapOffsetX), _f(s.y+mapOffsetY)
+        if sceneryLibrary[s.id].ani == true then
+          if s.fra == nil then s.fra = math.random(1, sl.fra) end
+          if s.sp == nil then s.sp = 1 end
+          if s.active then s.fra = s.fra + dt * s.sp end
+          if s.fra >= sl.fra+1 then s.fra = 1 end
+          gr.drawq(sl.i, sl.q[_f(s.fra)], x, y, r, s.sx, s.sy, sl.ox, sl.oy - elev)
+        else
+          gr.drawq(sl.i, sl.q, x, y + elev, r, s.sx, s.sy, sl.ox, sl.oy)
+        end
+        debugSceneryDrawn = debugSceneryDrawn + 1
+      elseif s.n == "Switch" then
+        local sce
+        if s.state == 1 then sce = s.imgOn else sce = s.imgOff end
+        if sce == nil then sce = "Barrel" end
+        sl = sceneryLibrary[sce]
+        local x, y = s.x+mapOffsetX+sl.ox, s.y+mapOffsetY+sl.oy
+        gr.drawq(sl.i, sl.q, x, y, 0, 1, 1, sl.ox, sl.oy)
+      elseif s.n == "Pushable" then
+        sl = sceneryLibrary[s.img]
+        local x, y = s.x+mapOffsetX, s.y+mapOffsetY
+        gr.drawq(sl.i, sl.q, x, y, 0, 1, 1, sl.ox, sl.oy)
+      elseif s.n == "Enemy" then
+        local sy, eof, px, py
+        gr.setBlendMode("alpha")
+        if s.inv > 0 then
+          gr.setColor(255,255,255,100)
+        else
+          gr.setColor(255,255,255,255)
+        end
+        if s.simple == false then
+          eof = (s.t - 1) * 64 + (_f(s.step/2) * 32)
+          gr.drawq(enemies, enemyGrid[s.facing - 1][eof/32], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))-32)
+        else
+          gr.drawq(enemies2, enemy2Grid[_f(s.step/2)], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))-32)
+        end
+      elseif s.n == "NPC" then
+        if s.map == mapNumber then
+          local sy = ((_f(s.step/16)) + ((s.who - 1) * 2))
+          gr.drawq(npcs, npcGrid[s.facing-1][sy], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY)), 0, 1, 1, 0, 48)
+          if s.somethingToSay == true then
+            gr.drawq(menuTitle, notifGrid[3], s.x + mapOffsetX+16, s.y + mapOffsetY - 8 + _s(time*5)*3, 0, 1, 1, 16, 72)
+          end
+        end
+      elseif s.n == "Player" then
+        --Draw the Player
+        if player.invAnim == 0 then
+          local px = (_f((player.x+mapOffsetX)))
+          local py = (_f((player.y+mapOffsetY)))
+          if player.attacking > 0 then
+            --Draw the player attack pose
+            gr.drawq(playerImg, playerGrid[player.facing - 1][4], px, py, 0, 1, 1, 32, 64)
+          else
+            --Regular walking player
+            gr.drawq(playerImg, playerGrid[player.facing - 1][_f(player.walking/8)], px, py, 0, 1, 1, 32, 64)
+          end
+        end
+      elseif s.n == "TargetArrow" then
+        local a = notifGrid[1]
+        if player.targetDist < 96 then a = notifGrid[2] end
+        gr.drawq(menuTitle, a, s.x, s.y, 0, 1, 1, 16, 32)
+      elseif s.n == "Dropped" then
+        local o = bounceOffset(s.num)
+        local drawIt = true
+        if s.life <= 1 then if _s(time*50) < 0 then drawIt = false end end
+        if drawIt == true then
+          gr.setColor(0,0,0,255/2)
+          gr.rectangle("fill",(s.x + mapOffsetX)+8-s.f/2, (s.y + mapOffsetY-2)-o,16+(s.f),2)
+          gr.setColor(255,255,255)
+          gr.drawq(dropItem, itemGrid[s.id], _f(s.x + mapOffsetX), _f(s.y + mapOffsetY+s.f-5)-32-o)
+        end
+      elseif s.n == "Projectile" then
+        r = _d2r(s.r * 90 + s.spin)
+        if s.time > 0 or s.ty ~= 2 then gr.drawq(projectiles, projectileGrid[s.ty][0], _f(s.x + mapOffsetX+16), _f(s.y + mapOffsetY-16), r, 1, 1, 16, 16) end
+      elseif s.n == "Boomerang" then
+        gr.drawq(projectiles, projectileGrid[3][0], _f(s.x+mapOffsetX), _f(s.y+mapOffsetY), s.boomSpin, 1, 1, 16, 16)
+      elseif s.n == "Explosion" then
+        gr.drawq(explosions, explosionGrid[_f(s.f)][0], _f(s.x + mapOffsetX)+16, _f(s.y + mapOffsetY)-(s.f*2)+16, s.f, 1+s.f/2, 1+s.f/2, 16, 16)
+      elseif s.n == "Floater" then
+        gr.setFont(floaterFont)
+        gr.setColor(0,0,0,255/2)
+        gr.printf(s.val, _f(s.x + mapOffsetX - 50)+2, _f(s.y + mapOffsetY - (32-s.life)-s.elev)+1, 100, "center")
+        gr.setColor(s.c[1],s.c[2],s.c[3],255-(32-s.life)*3)
+        gr.printf(s.val, _f(s.x + mapOffsetX - 50), _f(s.y + mapOffsetY - (32-s.life)-s.elev), 100, "center")
+      else
+        gr.setColor(0,0,255)
+        gr.rectangle("fill", s.x+mapOffsetX, s.y+mapOffsetY-32, 32, 32)
+        gr.setColor(0,0,0)
+        gr.rectangle("line", s.x+mapOffsetX, s.y+mapOffsetY-32, 32, 32)
+      end
+      if debugVar == 2 then gr.print(tostring(s.n), _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))) end --DEBUG CODE
 		end
 
 		mapDraw()
@@ -120,6 +127,8 @@ end
 
 function drawLowerLayer()
 	--Draw Tiles and Lower Objects Layer
+  gr.setColorMode("replace")
+  gr.setBlendMode("alpha")
 	for x=xBounds[0],xBounds[1]-1 do
 		for y=yBounds[0],yBounds[1]-1 do
 		  if x < 0 then x = 0 end
@@ -132,7 +141,8 @@ end
 
 function drawUpperLayer()
 	--Draw Upper Objects Layer
- 	gr.setColorMode("replace")
+  gr.setColorMode("replace")
+  gr.setBlendMode("alpha")
 	for x=xBounds[0],xBounds[1]-1 do
 		for y=yBounds[0],yBounds[1]-1 do
 		  if x < 0 then x = 0 end
@@ -156,10 +166,11 @@ function drawTile(tmp, x, y)
 end
 
 function drawStatusBar()
-	gr.setColor(255,255,255) --Draw Status Area
-	gr.setFont(numbers)
+  gr.setColorMode("modulate")
+  gr.setBlendMode("alpha")
+	gr.setFont(statusFont)
 
-	local tt = screenH - 80 + cut.val
+	local tt = screenH - 40 + cut.val
 
 	if player.money > player.rollMoney then
 		player.rollMoney = player.rollMoney + 4
@@ -169,11 +180,12 @@ function drawStatusBar()
 		player.rollMoney = player.rollMoney - 4
 		if player.rollMoney < player.money then player.rollMoney = player.money end
 	end
-	gr.print("A" .. player.arrows, screenW - 100, tt)
-	gr.print("B" .. player.bombs, screenW - 90, tt+40)
-	gr.print("$" .. player.rollMoney, 40, tt)
+  gr.setColor(0,0,0,200)
+	gr.printf("$" .. player.rollMoney, screenW - 248+2, tt+1, 200, "right")
+  gr.setColor(255,255,255)
+	gr.printf("$" .. player.rollMoney, screenW - 248, tt, 200, "right")
 
-	drawHeartGuage(48,tt + 54,player.health,player.maxHealth)
+	drawHeartGuage(48,tt + 14,player.health,player.maxHealth)
 end
 
 function drawHeartGuage(x,y,h,m)
@@ -210,6 +222,11 @@ function drawMenuScreen()
  	if menu.block > 0 then
 		gr.setColor(255,255,255,menu.block)
 		gr.rectangle("fill", 0,0,screenW,screenH)
+	end
+
+	for i=1,6000 do
+	  gr.setColor(255,255,255,f*.33)
+	  gr.point(math.random(0,799)+.5, math.random(0,499)+.5)
 	end
 
 	if math.random(0,4) == 1 then
@@ -379,8 +396,8 @@ function drawDebug(dt)
 			scriptData = scriptData .. " Paused:         " .. tostring(scriptPaused) .. "\n"
 			scriptData = scriptData .. " Waiting:        " .. tostring(scriptWaiting) .. "\n"
 			scriptData = scriptData .. " Wait For Cam:   " .. tostring(scriptWaitingForCamera) .. "\n"
-			scriptData = scriptData .. " npcIsMoving:    " .. tostring(npcIsMoving) .. "\n"
-			scriptData = scriptData .. " npcMoveSteps:   " .. tostring(npcMoveSteps) .. "\n"
+			scriptData = scriptData .. " actorIsMoving:    " .. tostring(actorIsMoving) .. "\n"
+			scriptData = scriptData .. " actorMoveSteps:   " .. tostring(actorMoveSteps) .. "\n"
 			if objIsMoving > 0 then
 				scriptData = scriptData .. " objIsMoving:  " .. tostring(objIsMoving) .. "\n"
 				scriptData = scriptData .. " objMoveSteps: " .. tostring(objMoveSteps) .. "\n"

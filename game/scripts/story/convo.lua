@@ -1,7 +1,7 @@
 --THE CUTSCENE CONVERSATION SCRIPT (RUNS ONLY ONCE)
 if gameFlag[1] ~= 1 then --If the conversation has not taken place...
 	table.insert(script, {c = "CUTSCENE", p1 = "IN", p2 = nil, p3 = nil, p4 = nil, d = false})
-	table.insert(script, {c = "SCROLLLOCK", p1 = "COORDS", p2 = 27*32, p3 = 38*32, p4 = 512, d = false})
+	table.insert(script, {c = "SCROLLLOCK", p1 = "COORDS", p2 = 27*32, p3 = 40*32, p4 = 128, d = false})
 	table.insert(script, {c = "MOVENPC", p1 = 1, p2 = "L", p3 = 12, p4 = nil, d = false})
 	table.insert(script, {c = "MOVENPC", p1 = 1, p2 = "D", p3 = 1, p4 = nil, d = false})
 	table.insert(script, {c = "DIALOG", p1 = 1, p2 = "Hope I wasn't spotted...", p3 = 1, p4 = nil, d = false})

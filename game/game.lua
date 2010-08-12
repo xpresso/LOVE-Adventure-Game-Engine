@@ -14,7 +14,10 @@ function loadFonts()
 
 	dialogFont = gr.newFont("game/images/fonts/Vollkorn.ttf", 22)
 	dialogFont:setLineHeight(1.2)
-	numbers = gr.newImageFont("game/images/fonts/numbers.png", " 0123456789.,$KAB")
+	statusFont = gr.newFont("game/images/fonts/Georgia.ttf", 32)
+	floaterFont = gr.newFont("game/images/fonts/Comfortaa Regular.ttf", 32)
+
+	--gr.newImageFont("game/images/fonts/numbers.png", " 0123456789.,$KAB")
 end
 
 --Images, Characters and Tile Sets
@@ -122,6 +125,7 @@ function loadImages()
 end
 
 function filterImages()
+  imgScenery:setFilter("nearest","nearest")
 end
 
 function buildInventory()
@@ -144,7 +148,7 @@ function buildInventory()
 
 	--TEMP
 	print("Inventory:")
-	for i, v in ipairs(inventoryList) do
+	for i, v in pairs(inventoryList) do
 		print(v.name .. " " .. v.count)
 	end
 
@@ -194,15 +198,20 @@ function resetGameVars(testing)
 
 	dropped = {}
 	dTable = {}
+	bounce = {}
 	setupItemTable()
 
 	hotzone = {}
 	switch = {}
 	projectile = {}
+	floater = {}
 	pBoom = 3
 	pBomb = 2
 	pArrow = 1
 	pRock = 0
+
+	onScreenTutorialTime = 0
+	onScreenTutorialMsg = ""
 
 	gameTime = { t = (17*60*60), h = 0, m = 0, s = 0 }
 
@@ -235,9 +244,9 @@ function resetGameVars(testing)
 		shakeY = 0,
 	}
 
-	npcMoveDirection = 0
-	npcMoveSteps = 0
-	npcIsMoving = 0
+	actorMoveDirection = 0
+	actorMoveSteps = 0
+	actorIsMoving = -1
 
 	objMoveDirection = 0
 	objMoveSteps = 0
@@ -291,7 +300,7 @@ function resetGameVars(testing)
 	player = {
 		name = tmpName,
 		x = 8*32,
-		y = 40*32,
+		y = 38*32,
 		cx = 0,
 		cy = 0,
 		oldXY = 0,
@@ -300,6 +309,8 @@ function resetGameVars(testing)
 		facing = 4,
 		walking = 0,
 		moving = false,
+		hasMeleeWeapon = false,
+		meleePower = 1,
 		targeting = 0,
 		targetDist = 0,
 		targetAng = 0,
@@ -328,7 +339,6 @@ function resetGameVars(testing)
 		boomReturn = false,
 		boomSpin = 0,
 		speed = 192,
-		swordPower = 1,
 		arrowPower = 2,
 		boomerangPower = 1,
 		hasShield = true,
@@ -382,12 +392,12 @@ function loadSwitches()
 end
 
 function setupItemTable()
-	table.insert(dTable, 0, {giveHP = 0, giveMoney = 1, giveArrows = 0, giveBombs = 0})
-	table.insert(dTable, 1, {giveHP = 0, giveMoney = 5, giveArrows = 0, giveBombs = 0})
-	table.insert(dTable, 2, {giveHP = 0, giveMoney = 10, giveArrows = 0, giveBombs = 0})
-	table.insert(dTable, 3, {giveHP = 1, giveMoney = 0, giveArrows = 0, giveBombs = 0})
-	table.insert(dTable, 4, {giveHP = 0, giveMoney = 0, giveArrows = 10, giveBombs = 0})
-	table.insert(dTable, 5, {giveHP = 0, giveMoney = 0, giveArrows = 0, giveBombs = 5})
+	table.insert(dTable, 0, {giveHP = 0, giveMoney = 1, giveArrows = 0, giveBombs = 0, name = "Money"})
+	table.insert(dTable, 1, {giveHP = 0, giveMoney = 5, giveArrows = 0, giveBombs = 0, name = "Money"})
+	table.insert(dTable, 2, {giveHP = 0, giveMoney = 10, giveArrows = 0, giveBombs = 0, name = "Money"})
+	table.insert(dTable, 3, {giveHP = 1, giveMoney = 0, giveArrows = 0, giveBombs = 0, name = "Health"})
+	table.insert(dTable, 4, {giveHP = 0, giveMoney = 0, giveArrows = 10, giveBombs = 0, name = "Arrow"})
+	table.insert(dTable, 5, {giveHP = 0, giveMoney = 0, giveArrows = 0, giveBombs = 5, name = "Bomb"})
 end
 
 function loadEnemyTypes()
@@ -416,6 +426,7 @@ function saveGame()
 	data = data .. "player.arrows = " .. player.arrows .. "\n"
 	data = data .. "player.bombs = " .. player.bombs .. "\n"
 	data = data .. "player.keys = " .. player.keys .. "\n"
+	data = data .. "player.hasMeleeWeapon = " .. tostring(player.hasMeleeWeapon) .. "\n"
 
 	data = data .. "gameFlag = {"
 	for i=1,1000 do
@@ -423,14 +434,14 @@ function saveGame()
 	end
 	data = data .. "}\n"
 
-	for i, p in ipairs(npc) do
+	for i, p in pairs(npc) do
 		data = data .. "npc[" .. i .. "].x = " .. npc[i].x .. "\n"
 		data = data .. "npc[" .. i .. "].y = " .. npc[i].y .. "\n"
 		data = data .. "npc[" .. i .. "].map = \"" .. npc[i].map .. "\"\n"
 		data = data .. "npc[" .. i .. "].facing = " .. npc[i].facing .. "\n"
 	end
 
-	for i, p in ipairs(switch) do
+	for i, p in pairs(switch) do
 		data = data .. "switch[" .. i .. "].map = \"" .. switch[i].map .. "\"\n"
 		data = data .. "switch[" .. i .. "].x = " .. switch[i].x .. "\n"
 		data = data .. "switch[" .. i .. "].y = " .. switch[i].y .. "\n"
@@ -471,8 +482,6 @@ function loadSceneryLibrary()
 	sceneryLibrary["Grass 1"] = { i = imgScenery, q = gr.newQuad(32, 128, 16, 16, tw1, th1), ox = 8, oy = 16, ani = false}
 
 	sceneryLibrary["Chimney"] = { i = imgScenery, q = gr.newQuad(352, 512, 32, 64, tw1, th1), ox = 16, oy = 48, ani = false }
-	sceneryLibrary["Roof Meet Left"] = { i = imgScenery, q = gr.newQuad(352, 160, 32, 64, tw1, th1), ox = 0, oy = 64, ani = false }
-	sceneryLibrary["Roof Top"] = { i = imgScenery, q = gr.newQuad(320, 160, 32, 32, tw1, th1), ox = 0, oy = 32, ani = false }
 
 	sceneryLibrary["Window"] = { i = imgScenery, q = gr.newQuad(0, 384, 34, 34, tw1, th1), ox = 1, oy = 34, ani = false }
 	sceneryLibrary["Window Wide"] = { i = imgScenery, q = gr.newQuad(48, 384, 64, 34, tw1, th1), ox = 1, oy = 34, ani = false }
@@ -482,8 +491,8 @@ function loadSceneryLibrary()
 
 	sceneryLibrary["Well"] = { i = imgScenery, q = gr.newQuad(11*32, 2*32, 32, 32, tw1, th1), ox = 0, oy = 32, ani = false }
 
-	sceneryLibrary["Bed"] = { i = imgScenery, q = gr.newQuad(15*32, 0, 32, 64, tw1, th1), ox = 0, oy = 16, ani = false }
-	sceneryLibrary["Bed Cover"] = { i = imgScenery, q = gr.newQuad(15*32, 2*32, 32, 32, tw1, th1), ox = 0, oy = 32, ani = false }
+	sceneryLibrary["Bed"] = { i = imgScenery, q = gr.newQuad(512, 0, 64, 112, tw1, th1), ox = 0, oy = 32, ani = false }
+	sceneryLibrary["Bed Cover"] = { i = imgScenery, q = gr.newQuad(512+64, 0, 64, 112, tw1, th1), ox = 0, oy = 96, ani = false }
 
 	sceneryLibrary["Beer"] = { i = imgScenery, q = gr.newQuad(384, 192, 8, 16, tw1, th1), ox = 4, oy = 16, ani = false }
 
@@ -498,10 +507,8 @@ function loadSceneryLibrary()
 	sceneryLibrary["Counter E"] = { i = imgScenery, q = gr.newQuad(384, 128, 32, 24, tw1, th1), ox = 0, oy = 24, ani = false }
 
 	sceneryLibrary["Door Opened 1"] = { i = imgScenery, q = gr.newQuad(0, 456, 40, 56, tw1, th1), ox = 4, oy = 56, ani = false }
-	sceneryLibrary["Door Closed 1"] = { i = imgScenery, q = gr.newQuad(80, 456, 40, 56, tw1, th1), ox = 4, oy = 56, ani = false }
 	sceneryLibrary["Door Opened 1B"] = { i = imgScenery, q = gr.newQuad(40, 456, 40, 56, tw1, th1), ox = 4, oy = 56, ani = false }
-	sceneryLibrary["Door Opened 2"] = { i = imgScenery, q = gr.newQuad(13*32, 0, 32, 64, tw1, th1), ox = 0, oy = 64, ani = false }
-	sceneryLibrary["Door Closed 2"] = { i = imgScenery, q = gr.newQuad(14*32, 0, 32, 64, tw1, th1), ox = 0, oy = 64, ani = false }
+	sceneryLibrary["Door Closed 1"] = { i = imgScenery, q = gr.newQuad(80, 456, 40, 56, tw1, th1), ox = 4, oy = 56, ani = false }
 
 	sceneryLibrary["Sign"] = { i = imgScenery, q = gr.newQuad(256, 32, 32, 32, tw1, th1), ox = 16, oy = 32, ani = false }
 
@@ -521,6 +528,7 @@ function loadSceneryLibrary()
 	sceneryLibrary["Wall Bricks 4"] = { i = imgScenery, q = gr.newQuad(0, 512, 128, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Wall Bricks L"] = { i = imgScenery, q = gr.newQuad(128, 512, 16, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Wall Bricks R"] = { i = imgScenery, q = gr.newQuad(128+16, 512, 16, 64, tw1, th1), ox = 0, oy = 64, ani = false }
+	sceneryLibrary["Wall Bricks OD"] = { i = imgScenery, q = gr.newQuad(4, 512, 32, 12, tw1, th1), ox = 0, oy = 64, ani = false }
 
 	sceneryLibrary["Wall Siding 1"] = { i = imgScenery, q = gr.newQuad(0, 512+64, 32, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Wall Siding 2"] = { i = imgScenery, q = gr.newQuad(0, 512+64, 64, 64, tw1, th1), ox = 0, oy = 64, ani = false }
@@ -528,6 +536,7 @@ function loadSceneryLibrary()
 	sceneryLibrary["Wall Siding 4"] = { i = imgScenery, q = gr.newQuad(0, 512+64, 128, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Wall Siding L"] = { i = imgScenery, q = gr.newQuad(128, 512+64, 16, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Wall Siding R"] = { i = imgScenery, q = gr.newQuad(128+16, 512+64, 16, 64, tw1, th1), ox = 0, oy = 64, ani = false }
+	sceneryLibrary["Wall Siding OD"] = { i = imgScenery, q = gr.newQuad(4, 512+64, 32, 12, tw1, th1), ox = 0, oy = 64, ani = false }
 
 	sceneryLibrary["Wall Beige 1"] = { i = imgScenery, q = gr.newQuad(0, 512+128, 32, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Wall Beige 2"] = { i = imgScenery, q = gr.newQuad(0, 512+128, 64, 64, tw1, th1), ox = 0, oy = 64, ani = false }
@@ -535,6 +544,7 @@ function loadSceneryLibrary()
 	sceneryLibrary["Wall Beige 4"] = { i = imgScenery, q = gr.newQuad(0, 512+128, 128, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Wall Beige L"] = { i = imgScenery, q = gr.newQuad(128, 512+128, 16, 64, tw1, th1), ox = 0, oy = 64, ani = false }
 	sceneryLibrary["Wall Beige R"] = { i = imgScenery, q = gr.newQuad(128+16, 512+128, 16, 64, tw1, th1), ox = 0, oy = 64, ani = false }
+	sceneryLibrary["Wall Beige OD"] = { i = imgScenery, q = gr.newQuad(4, 512+128, 32, 12, tw1, th1), ox = 0, oy = 64, ani = false }
 
 	sceneryLibrary["Roof H5 T"] = { i = imgScenery, q = gr.newQuad(160, 512, 176, 96, tw1, th1), ox = 0, oy = 96, ani = false }
 	sceneryLibrary["Roof H5 M"] = { i = imgScenery, q = gr.newQuad(160, 512+96, 176, 32, tw1, th1), ox = 0, oy = 32, ani = false }
@@ -561,8 +571,9 @@ function loadSceneryLibrary()
 	sceneryLibrary["Clock Hand Minute Tiny"] = { i = imgScenery, q = gr.newQuad(224+64-48, 352, 1, 6, tw1, th1), ox = 0, oy = 0, ani = false }
 	sceneryLibrary["Clock Hand Hour Tiny"] = { i = imgScenery, q = gr.newQuad(224+64+2-48, 352+8, 1, 4, tw1, th1), ox = 0, oy = 0, ani = false }
 
-	sceneryLibrary["Distant Cloud"] = { i = imgScenery, q = gr.newQuad(208, 448, 112, 48, tw1, th1), ox = 56, oy = 24, ani = false }
-	sceneryLibrary["Sun"] = { i = imgScenery, q = gr.newQuad(256, 160, 80, 80, tw1, th1), ox = 40, oy = 40, ani = false }
+	sceneryLibrary["Cloud 1"] = { i = imgScenery, q = gr.newQuad(0, 896, 672, 128, tw1, th1), ox = 0, oy = 128, ani = false }
+	sceneryLibrary["Cloud 2"] = { i = imgScenery, q = gr.newQuad(672, 896, 352, 128, tw1, th1), ox = 0, oy = 128, ani = false }
+	sceneryLibrary["Sun"] = { i = imgScenery, q = gr.newQuad(944, 816, 80, 80, tw1, th1), ox = 40, oy = 40, ani = false }
 
 
 	for i, l in pairs(sceneryLibrary) do
@@ -587,6 +598,7 @@ function loadAudio()
 	muzac["overworld_2"] = love.audio.newSource("game/audio/music/Porch Swing Days - slower.ogg", "stream")
 	muzac["town_1"] = love.audio.newSource("game/audio/music/Thatched Villagers.ogg", "stream")
 	muzac["house_1"] = love.audio.newSource("game/audio/music/Cattails.ogg", "stream")
+	muzac["danger_1"] = love.audio.newSource("game/audio/music/Baltic Levity.ogg", "stream")
 
 	sfx = {}
 	sfx[1] = love.audio.newSource("game/audio/sfx/menu_cursor.ogg", "static")
@@ -619,4 +631,5 @@ function loadAudio()
 	sfx[997] = love.audio.newSource("game/audio/sfx/text_letter.ogg", "static")
 	sfx[998] = love.audio.newSource("game/audio/sfx/text_done.ogg", "static")
 	sfx[999] = love.audio.newSource("game/audio/sfx/exitgame.ogg", "static")
+	sfx[1000] = love.audio.newSource("game/audio/sfx/Der Kleber Sting.ogg", "static")
 end

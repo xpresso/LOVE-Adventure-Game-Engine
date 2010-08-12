@@ -19,12 +19,11 @@ table.insert(scenery, 10000, { x = 656, y = 1190.01, id = "Clock Face", z = 2, s
 table.insert(scenery, 10001, { x = 656, y = 1190.02, id = "Clock Hand Hour", z = 2, sx = .75, sy = .75, r = 0, elev = -160} )
 table.insert(scenery, 10002, { x = 656, y = 1190.03, id = "Clock Hand Minute", z = 2, sx = .75, sy = .75, r = 0, elev = -160} )
 
-table.insert(scenery, 10100, { x = 656, y = 0, id = "Sun", z = 2, sx = 1, sy = 1, elev = 250} )
-for i=1,10 do
-  local s = (math.random(7,10)/10)
-  table.insert(scenery, 10002+i, { x = math.random(64,screenW+128), y = math.random(48,320), id = "Distant Cloud",
-                                   z = 2, sx = s*1.5, sy = s, elev = 0, s = math.random(8,32)} )
-end
+table.insert(scenery, 10100, { x = 656, y = 0, id = "Sun", z = 2, sx = 1, sy = 1, elev = 250, s = 2} )
+
+table.insert(scenery, 10101, { x = 700, y = 352, id = "Cloud 2", z = 2, sx = 1, sy = 1, elev = 0, s = 40} )
+table.insert(scenery, 10102, { x = 0, y = 353, id = "Cloud 1", z = 2, sx = 1, sy = 1, elev = -1, s = 32} )
+table.insert(scenery, 10103, { x = 900, y = 352, id = "Cloud 2", z = 2, sx = 1, sy = 1, elev = 0, s = 24} )
 
 if gameFlag[97] ~= 1 then
   currentScript = "story/intro"
@@ -38,13 +37,16 @@ weather.skyRoll = 0
 tempText={ to=0, val=0, t = "", f = creditFontA }
 
 mapUpdate = function()
+  local dt = love.timer.getDelta()
 	scenery[10001].r = math.rad(((gameTime.h*(360/12))+180))
 	scenery[10002].r = math.rad(((gameTime.m*(360/60))+180))
 
 	if camera.y < 1000 then
-	  for i=1,10 do
-	    scenery[10002+i].x = scenery[10002+i].x - scenery[10002+i].s * love.timer.getDelta()
-	  end
+    scenery[10100].y = scenery[10100].y - scenery[10100].s * dt
+
+    scenery[10101].x = scenery[10101].x - scenery[10101].s * dt
+    scenery[10102].x = scenery[10102].x - scenery[10102].s * dt
+    scenery[10103].x = scenery[10103].x - scenery[10103].s * dt
 	end
 end
 

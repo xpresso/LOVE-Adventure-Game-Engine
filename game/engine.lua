@@ -158,6 +158,8 @@ function love.update(dt)
    	updateGameTime(dt)
 
     mapUpdate()
+    updateBounce(dt)
+    updateFloaters(dt)
 
 		sprites[1] = player
 		sprites[1].n = "Player"
@@ -346,7 +348,7 @@ function love.update(dt)
 						currentScript = switch[check-1000].script
 						check = 0
 						player.attackDone = true
-					elseif player.attacking <= 0 then
+					elseif player.attacking <= 0 and player.hasMeleeWeapon then
 						playSound(10)
 						player.attacking = 10
 						player.attackDone = true
@@ -405,7 +407,7 @@ function love.update(dt)
 						if overlap(_f(player.x), _f(player.y-16), 32, 48, _f(e.x), _f(e.y-32), e.w, e.h, 7905) == true and enemy[j].HP > 0 then hitEnemy = true end
 					end
 					if hitEnemy == true and e.inv <= 0 then
-						knockEnemy(j, player.facing, player.swordPower)
+						knockEnemy(j, player.facing, player.meleePower)
 					end
 				end
 				moveEnemy(j, dt)
@@ -446,11 +448,22 @@ function love.update(dt)
 			sprites[i].n = "Scenery"
 		end
 
-		for j, d in ipairs(dropped) do
+		for j, d in pairs(dropped) do
+      if bounce[j] then
+        d.x = d.x + bounce[j].xslide * dt
+        d.y = d.y + bounce[j].yslide * dt
+      end
 			local i = #sprites+1
 			sprites[i] = d
+			sprites[i].num = j
 			sprites[i].n = "Dropped"
 		end
+
+    for i, f in pairs(floater) do
+			local i = #sprites+1
+			sprites[i] = f
+			sprites[i].n = "Floater"
+    end
 
 		for j, w in pairs(switch) do
 			if w.map == mapNumber and w.x >= xBounds[0] * 32 - 128 and w.x <= xBounds[1] * 32 + 128 and w.y >= yBounds[0] * 32 - 128 and w.y <= yBounds[1] * 32 + 128 then
@@ -461,7 +474,7 @@ function love.update(dt)
 			end
 		end
 
-		for j, e in ipairs(explosion) do
+		for j, e in pairs(explosion) do
 			e.f = e.f + 5 * dt
 			if e.f > 3 then destroyExplosion(j) end
 
@@ -502,8 +515,6 @@ function love.draw(dt)
 		drawMapComposite(dt)
 		if menu.opened == false and testMode == false then drawStatusBar() end
 		drawFade()
-		if dialog.opened == true then drawDialog(dt) end
-		drawInventory()
 
 		if mapNameFade >= 200 and menu.opened == false then
 			gr.setBlendMode("alpha")
@@ -514,6 +525,19 @@ function love.draw(dt)
 			gr.setColor(0,0,0,255)
 			gr.printf(mapName, 0, screenH-120, screenW, "center")
 		end
+		if onScreenTutorialTime > 0 then
+		  onScreenTutorialTime = onScreenTutorialTime - 1 * dt
+			gr.setBlendMode("alpha")
+			gr.setColorMode("modulate")
+			gr.setFont(menuFont)
+			gr.setColor(0,0,0,255)
+			gr.printf(onScreenTutorialMsg, 2, screenH-80+1, screenW, "center")
+			gr.setColor(255,255,255,150)
+			gr.printf(onScreenTutorialMsg, 0, screenH-80, screenW, "center")
+		end
+
+		if dialog.opened == true then drawDialog(dt) end
+		drawInventory()
 	end
 
 	if (menu.fade > 0 or menu.slide > 0) and gameMode ~= inStartup and gameMode ~= editMode then
@@ -1152,6 +1176,7 @@ function animateMenu(dt)
 end
 
 function setMusic(m,l)
+  print("Playing Music: "..m)
   if m == -1 then m = currentMusic end
 	if musicOn and enableAudio and m ~= 0 and currentMusic ~= m then
 	  love.audio.stop()
@@ -1163,7 +1188,8 @@ function setMusic(m,l)
 end
 
 function playSound(s)
-	if soundOn and enableAudio and s > -1 then love.audio.play(sfx[s]) end
+  print("Playing Sound FX: "..s)
+	if soundOn and enableAudio and sfx[s] then love.audio.play(sfx[s]) end
 end
 
 function createConfiguration(sw, sh)
@@ -1304,6 +1330,11 @@ function logoCollide(a, b, c)
 			playSound(59)
 		end
 	end
+end
+
+function setTutorMsg(t)
+  onScreenTutorialTime = 3
+  onScreenTutorialMsg = t
 end
 
 function returnFaceDirFromAng(a)

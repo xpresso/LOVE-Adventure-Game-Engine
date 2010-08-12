@@ -293,16 +293,22 @@ end
 
 --ITEMS/DROPPED
 function spawnDropped(id,xx,yy,t)
-	table.insert(dropped, { x = _f(xx), y = _f(yy), time = t, id = id, f = 0, dt = time, life = 10 })
+  local num = startBounce(math.random(24,40), 3, math.random(8,12), function() end)
+	table.insert(dropped, num, { x = _f(xx), y = _f(yy)+(math.random(1,10)/100), time = t, id = id, f = 0, dt = time, life = 10 })
 end
 
 function updateDropped(dt)
-	for i, d in ipairs(dropped) do
+	for i, d in pairs(dropped) do
 		d.f = _s((time-d.dt)*5)*2
 		if menu.opened == false then
 			d.life = d.life - dt
 			if d.life <= 0 then destroyDropped(i) end
 			if overlap(_f(d.x), _f(d.y-32), 32, 32, _f(player.x)+2, _f(player.y-32)+2, 28, 28, 7927) == true then
+        local m = dTable[d.id].giveMoney
+        if m > 0 then
+          local val = "$" .. m
+          createFloater(d.x, d.y, val, {100,255,100})
+        end
 				giveItem(d.id)
 				destroyDropped(i)
 			end
@@ -310,7 +316,9 @@ function updateDropped(dt)
 	end
 end
 
-function destroyDropped(dr) table.remove(dropped, dr) end
+function destroyDropped(dr)
+  dropped[dr] = nil
+end
 
 function giveItem(d)
 	player.health = player.health + tonumber(dTable[d].giveHP)
@@ -326,6 +334,84 @@ function giveItem(d)
 		playSound(51)
 	end
 end
+
+function createFloater(x,y,v,c)
+  table.insert(floater, {x = x, y = y, val = v, c = c, life = 32, elev = 90})
+end
+
+function updateFloaters(dt)
+  for i, f in pairs(floater) do
+    f.life = f.life - 64 * dt
+    if f.life <= 0 then table.remove(floater, i) end
+  end
+end
+
+function startBounce(m, t, s, c, i)
+  local id
+  if i then
+    id = i
+  else
+    id = math.random(10000000,99999999)
+  end
+  local a = math.random(0,359)
+  bounce[id] = {
+    val = 0,
+    max = m,
+    speed = s,
+    times = t,
+    dir = 0,
+    offset = 0,
+    callback = c,
+    xslide = (math.cos(a * pi / 180) * 64) * 1,
+    yslide = (math.sin(a * pi / 180) * 64) * .75
+  }
+  return id
+end
+
+function updateBounce(dt)
+  for i, b in pairs(bounce) do
+    if b.times > 0 then
+      if b.dir == 0 then b.dir = 1 end
+      if b.dir == 1 then
+        b.val = b.val + b.speed * dt
+        if b.val > math.pi/2 then b.val = math.pi/2 b.dir = -1 end
+      elseif b.dir == -1 then
+        b.val = b.val - b.speed * dt
+        if b.val < 0 then
+          b.val = 0
+          if b.times > 0 then
+            b.max = b.max * .5
+            b.speed = b.speed * 1.5
+            b.dir = 1
+            b.times = b.times - 1
+          end
+        end
+      end
+      b.offset = _s(b.val) * b.max
+      if b.times == 0 then
+        b.callback()
+        bounce[i] = nil
+      end
+    end
+  end
+end
+
+function bounceOffset(i)
+  local o = 0
+  if bounce[i] then
+    o = bounce[i].offset
+  end
+  return o
+end
+
+function bounceActive(i)
+  local a = false
+  if bounce[i] then
+    a = true
+  end
+  return a
+end
+
 
 function createEnemy(t, x, y, s, e)
 	local ww = 32
@@ -478,7 +564,9 @@ end
 
 function destroyEnemy(e)
 	print("Destroy Enemy "..e)
-	spawnDropped(_r(0,5),enemy[e].x,enemy[e].y,-1)
+  for i=1,math.random(1,5) do
+  	spawnDropped(_r(0,5),enemy[e].x,enemy[e].y,-1)
+  end
 	spawnExplosion(enemy[e].x,enemy[e].y-16)
 	if enemy[e].script ~= "" then currentScript = enemy[e].script end
 	table.remove(enemy, e)
