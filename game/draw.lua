@@ -180,10 +180,11 @@ function drawStatusBar()
 		player.rollMoney = player.rollMoney - 4
 		if player.rollMoney < player.money then player.rollMoney = player.money end
 	end
+	local mm = formatNumber(player.rollMoney)
   gr.setColor(0,0,0,200)
-	gr.printf("$" .. player.rollMoney, screenW - 248+2, tt+1, 200, "right")
+	gr.printf("$" .. mm, screenW - 248+2, tt+1, 200, "right")
   gr.setColor(255,255,255)
-	gr.printf("$" .. player.rollMoney, screenW - 248, tt, 200, "right")
+	gr.printf("$" .. mm, screenW - 248, tt, 200, "right")
 
 	drawHeartGuage(48,tt + 14,player.health,player.maxHealth)
 end

@@ -1379,6 +1379,10 @@ function love.mousereleased( x, y, button )
 	end
 end
 
+function formatNumber(number)
+   return (string.format("%d", number):reverse():gsub( "(%d%d%d)" , "%1," ):reverse():gsub("^(-?),","%1"))
+end
+
 function bezier_curveline( x1, y1, hx1, hy1, x2, y2, hx2, hy2, samples )
 	local samples = samples or 500
 	local s = 1/samples

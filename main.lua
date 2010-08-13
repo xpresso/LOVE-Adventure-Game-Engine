@@ -1,9 +1,5 @@
-require( "game/engine.lua" )
-require( "game/game.lua" )
-require( "game/draw.lua" )
-require( "game/world.lua" )
-require( "game/scripting.lua" )
-require( "game/editor.lua" )
+require( "game/engine.lua" ) require( "game/game.lua" ) require( "game/draw.lua" )
+require( "game/world.lua" ) require( "game/scripting.lua" ) require( "game/editor.lua" )
 love.filesystem.setIdentity("Adventure")
 
 _r = math.random _f = math.floor _c = math.cos _s = math.sin _sq = math.sqrt _at2 = math.atan2 _d2r = math.rad _r2d = math.deg _m = math.mod pi = math.pi

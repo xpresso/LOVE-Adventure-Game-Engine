@@ -307,7 +307,7 @@ function updateDropped(dt)
         local m = dTable[d.id].giveMoney
         if m > 0 then
           local val = "$" .. m
-          createFloater(d.x, d.y, val, {100,255,100})
+          createFloater(d.x, d.y, 90, val, {100,255,100})
         end
 				giveItem(d.id)
 				destroyDropped(i)
@@ -335,8 +335,8 @@ function giveItem(d)
 	end
 end
 
-function createFloater(x,y,v,c)
-  table.insert(floater, {x = x, y = y, val = v, c = c, life = 32, elev = 90})
+function createFloater(x,y,e,v,c)
+  table.insert(floater, {x = x, y = y, val = v, c = c, life = 32, elev = e})
 end
 
 function updateFloaters(dt)
@@ -362,8 +362,8 @@ function startBounce(m, t, s, c, i)
     dir = 0,
     offset = 0,
     callback = c,
-    xslide = (math.cos(a * pi / 180) * 64) * 1,
-    yslide = (math.sin(a * pi / 180) * 64) * .75
+    xslide = (math.cos(a * pi / 180) * 128) * 1,
+    yslide = (math.sin(a * pi / 180) * 128) * .75
   }
   return id
 end
@@ -439,7 +439,12 @@ function damageEnemy(e, d)
 	print("Damage Enemy "..e.." with "..d)
 	playSound(100)
 	enemy[e].HP = enemy[e].HP - d
-	if enemy[e].HP <= 0 then destroyEnemy(e) end
+	if enemy[e].HP <= 0 then
+    createFloater(enemy[e].x, enemy[e].y, 32, "Yay!", {100,255,100})
+	  destroyEnemy(e)
+  else
+  	createFloater(enemy[e].x, enemy[e].y, 32, "-"..d, {255,0,0})
+	end
 end
 
 function knockEnemy(e, dir, p)
