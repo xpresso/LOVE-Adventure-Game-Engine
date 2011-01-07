@@ -1,6 +1,5 @@
 --GUARD'S SCRIPT
 gameFlag[2] = gameFlag[2] + 1
-table.insert(script, {c = "CUTSCENE", p1 = "IN", p2 = nil, p3 = nil, p4 = nil, d = false})
 if gameFlag[2] < 3 then
 	table.insert(script, {c = "DIALOG", p1 = 3, p2 = "Go away.", p3 = nil, p4 = nil, d = false})
 elseif gameFlag[2] == 3 then
@@ -18,5 +17,4 @@ elseif gameFlag[2] == 20 then
 elseif gameFlag[2] > 4 then
 	table.insert(script, {c = "DIALOG", p1 = 3, p2 = "...", p3 = nil, p4 = nil, d = false})
 end
-table.insert(script, {c = "CUTSCENE", p1 = "OUT", p2 = nil, p3 = nil, p4 = nil, d = false})
 table.insert(script, {c = "FACENPC", p1 = 3, p2 = "D", p3 = nil, p4 = nil, d = false})

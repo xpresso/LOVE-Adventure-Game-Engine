@@ -1,3 +1,5 @@
+cut.statTo = 0
+cut.stat = 0
 table.insert(script, {c = "SETMUSIC", p1 = "intro"})
 table.insert(script, {c = "MOVECAMERA", p1 = 400, p2 = 0})
 table.insert(script, {c = "WAIT", p1 = 4})

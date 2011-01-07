@@ -3,7 +3,7 @@ if gameFlag[1] == 0 then															--If the Flag has not been set
 end
 addHotZone(mapWidth-8,384+64+704,8,96,"warps/to_map2")			--Path to woods
 
-createEnemy(math.random(1,5), 30*32, 40*32, "", true)
+createEnemy(_r(1,5), 30*32, 40*32, "", true)
 
 addPushable(1, 13*32, 38*32, 14, true, "Barrel", "switches/barrel")
 
@@ -101,9 +101,9 @@ mapDraw = function()
       gr.setColorMode("modulate")
       gr.setFont(tempText.f)
       gr.setColor(0,0,0,tempText.val/2)
-      gr.printf(tempText.t, 1, 252, screenW, "center")
+      gr.printf(tempText.t, 1, 212, screenW, "center")
       gr.setColor(255,255,255,tempText.val)
-      gr.printf(tempText.t, 0, 250, screenW, "center")
+      gr.printf(tempText.t, 0, 210, screenW, "center")
     end
   end
 end

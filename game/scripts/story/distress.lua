@@ -13,8 +13,8 @@ if gameFlag[54] ~= 1 then --If the conversation has not taken place...
 	table.insert(script, {c = "CUTSCENE", p1 = "OUT", d = false})
 
 	for i=1,10 do
-		local xx, yy = math.random(3,(mapWidth/32)-4) * 32, math.random(10,(mapHeight/32)-3) * 32
+		local xx, yy = _r(3,(mapWidth/32)-4) * 32, _r(10,(mapHeight/32)-3) * 32
 		if mapHit[xx/32][yy/32] ~= "." then yy = yy - 32 end
-		createEnemy(math.random(1,5), xx, yy, "enemies/e1", true)
+		createEnemy(_r(1,5), xx, yy, "enemies/e1", true)
 	end
 end
