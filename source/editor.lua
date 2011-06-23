@@ -81,8 +81,8 @@ function editorUpdate(dt)
 			my = ms.getY()
 		end
 
-		editorMouseTileX = _f(mx / 32)
-		editorMouseTileY = _f(my / 32)
+		editorMouseTileX = _f(mx / scrn.ts)
+		editorMouseTileY = _f(my / scrn.ts)
 
 		if editorMouseTileX < 0 then editorMouseTileX = 0 end
 		if editorMouseTileY < 0 then editorMouseTileY = 0 end
@@ -181,7 +181,7 @@ function editorDrawTile(tmp, x, y, l)
 	if tmp ~= "0000" and tmp ~= nil and editorLayerActive[l] == 1 then
 		local xx = tonumber(string.sub(tmp, 1, 2))
 		local yy = tonumber(string.sub(tmp, 3, 4))
-		gr.drawq(imgScenery, tileGrid[xx][yy], (x*32)-_f(editorScrollX), (y*32)-_f(editorScrollY))
+		gr.drawq(imgScenery, tileGrid[xx][yy], (x*scrn.ts)-_f(editorScrollX), (y*scrn.ts)-_f(editorScrollY))
 	end
 end
 
@@ -244,7 +244,7 @@ function editorDraw(dt)
 
 			if editorLayerActive[4] == 1 then
 				for _,s in pairs(sprites) do
-					if s.x > xBounds[0]*32-128 and s.x < xBounds[1]*32+128 and s.y > yBounds[0]*32-128 and s.y < yBounds[1]*32+128 then
+					if s.x > xBounds[0]*scrn.ts-scrn.ts*4 and s.x < xBounds[1]*scrn.ts+scrn.ts*4 and s.y > yBounds[0]*scrn.ts-scrn.ts*4 and s.y < yBounds[1]*scrn.ts+scrn.ts*4 then
 						local sl = sceneryLibrary[s.id]
 						if s.n == "Scenery" then
 							i = sl.i
@@ -299,9 +299,9 @@ function editorDraw(dt)
 							debugSceneryDrawn = debugSceneryDrawn + 1
 						else
 							gr.setColor(0,0,255)
-							gr.rectangle("fill", s.x+editorScrollX, s.y+editorScrollY-32, 32, 32)
+							gr.rectangle("fill", s.x+editorScrollX, s.y+editorScrollY-scrn.ts, scrn.ts, scrn.ts)
 							gr.setColor(0,0,0)
-							gr.rectangle("line", s.x+editorScrollX, s.y+editorScrollY-32, 32, 32)
+							gr.rectangle("line", s.x+editorScrollX, s.y+editorScrollY-scrn.ts, scrn.ts, scrn.ts)
 						end
 					end
 				end
@@ -321,10 +321,10 @@ function editorDraw(dt)
 						elseif tmp == "w" then
 							gr.setColor(0,0,255,80)
 						end
-						gr.rectangle("fill", (x*32)-editorScrollX, (y*32)-editorScrollY, 32, 32)
+						gr.rectangle("fill", (x*scrn.ts)-editorScrollX, (y*scrn.ts)-editorScrollY, scrn.ts, scrn.ts)
 						gr.setColor(255,255,255,255)
 						gr.setFont(editorFont)
-						gr.print(tmp, (x*32)-editorScrollX, (y*32)-editorScrollY+10)
+						gr.print(tmp, (x*scrn.ts)-editorScrollX, (y*scrn.ts)-editorScrollY+10)
 					end
 
 					if editorGrid then

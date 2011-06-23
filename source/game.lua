@@ -17,7 +17,7 @@ function loadFonts()
 	dialogFont = gr.newFont("game/images/fonts/Vollkorn.ttf", 28)
 	dialogFont:setLineHeight(2)
 	statusFont = gr.newFont("game/images/fonts/Vollkorn.ttf", 32)
-	floaterFont = gr.newFont("game/images/fonts/Georgia.ttf", 32)
+	floaterFont = gr.newFont("game/images/fonts/AltDefault.ttf", 26)
 
 	--gr.newImageFont("game/images/fonts/numbers.png", " 0123456789.,$KAB")
 end
@@ -33,7 +33,7 @@ function loadImages()
 	dropItem = gr.newImage("game/images/stage/dropped.png")
 	rain = gr.newImage("game/images/stage/rain.png")
 
-	playerImg = gr.newImage("game/images/actors/player.png")
+	playerImg = gr.newImage("game/images/actors/playerb.png")
 	npcs = gr.newImage("game/images/actors/npcs.png")
 	enemies = gr.newImage("game/images/actors/enemies.png")
 	enemies2 = gr.newImage("game/images/actors/enemies2.png")
@@ -49,12 +49,13 @@ function loadImages()
 	playerGrid = {}
 	for x=0,3 do
 		playerGrid[x] = {}
-		playerGrid[x][0] = gr.newQuad(x * 96, 0 * 96, 96, 96, playerImg:getWidth(), playerImg:getHeight())
-		playerGrid[x][1] = gr.newQuad(x * 96, 1 * 96, 96, 96, playerImg:getWidth(), playerImg:getHeight())
-		playerGrid[x][2] = gr.newQuad(x * 96, 0 * 96, 96, 96, playerImg:getWidth(), playerImg:getHeight())
-		playerGrid[x][3] = gr.newQuad(x * 96, 2 * 96, 96, 96, playerImg:getWidth(), playerImg:getHeight())
-		playerGrid[x][4] = gr.newQuad(x * 96, 3 * 96, 96, 96, playerImg:getWidth(), playerImg:getHeight())
+		for y=0,7 do
+  		playerGrid[x][y] = gr.newQuad(x * 32, y * 64, 32, 64, playerImg:getWidth(), playerImg:getHeight())
+    end
 	end
+	actorShadow = gr.newQuad(0, 496, 32, 16, playerImg:getWidth(), playerImg:getHeight())
+	weaponYoyo = gr.newQuad(0, 480, 16, 16, playerImg:getWidth(), playerImg:getHeight())
+	weaponYoyoString = gr.newQuad(16, 480, 16, 16, playerImg:getWidth(), playerImg:getHeight())
 
 	enemyGrid = {}
 	for x=0,enemies:getWidth()/32-1 do
@@ -228,6 +229,13 @@ function resetGameVars(testing)
 		shakeY = 0,
 	}
 
+	floaterTime = {
+	  money = -1,
+	  moneyTotal = 0,
+	  health = -1,
+	  healthTotal = 0
+	}
+
 	actorMoveDirection = 0
 	actorMoveSteps = 0
 	actorIsMoving = -1
@@ -290,7 +298,14 @@ function resetGameVars(testing)
 		attackDone = false,
 		facing = 4,
 		walking = 0,
+		walkframe = 0,
 		moving = false,
+		yoyo = 0,
+		yoyodist = 8,
+		yoyopow = 1,
+		yoyospeed = 64,
+		yyx = 0,
+		yyy = 0,
 		hasMeleeWeapon = false,
 		meleePower = 1,
 		targeting = 0,
@@ -661,9 +676,9 @@ function setupItemTable()
 	dTable["exp1"] = {give = function() addExperience(1,true) end, name = "XP", spr = 0}
 	dTable["exp5"] = {give = function() addExperience(5,true) end, name = "XP", spr = 0}
 	dTable["exp10"] = {give = function() addExperience(10,true) end, name = "XP", spr = 0}
-	dTable[1] = {give = function() addMoney(1,true) end, name = "Money", spr = 1}
-	dTable[2] = {give = function() addMoney(5,true) end, name = "Money", spr = 2}
-	dTable[3] = {give = function() addMoney(10,true) end, name = "Money", spr = 3}
+	dTable[1] = {give = function() addMoney(.01,true) end, name = "Money", spr = 1}
+	dTable[2] = {give = function() addMoney(.10,true) end, name = "Money", spr = 2}
+	dTable[3] = {give = function() addMoney(.25,true) end, name = "Money", spr = 3}
 	dTable[4] = {give = function() addHealth(1,true) end, name = "Health", spr = 4}
 	dTable[5] = {give = function() addArrows(10,true) end, name = "Arrow", spr = 5}
 	dTable[6] = {give = function() addBombs(5,true) end, name = "Bomb", spr = 6}
@@ -680,23 +695,19 @@ function addExperience(xp, s)
 end
 
 function addMoney(m, s)
+  floaterTime.money = 0
 	playSound(50)
   player.money = player.money + m
   if player.money > player.wallet then player.money = player.wallet end
-  if s then
-    local val = "$" .. m
-    createFloater(player.x, player.y+1, 64, val, {100,255,100})
-  end
+  floaterTime.moneyTotal = floaterTime.moneyTotal + m
 end
 
 function addHealth(hp, s)
+  floaterTime.health = 0
   playSound(52)
   player.health = player.health + hp
   if player.health > player.maxHealth then player.health = player.maxHealth end
-  if s then
-    local val = "+" .. hp .. "HP"
-    createFloater(player.x, player.y+1, 64, val, {100,100,255})
-  end
+  floaterTime.healthTotal = floaterTime.healthTotal + hp
 end
 
 function addArrows(a, s)
@@ -707,4 +718,27 @@ end
 function addBombs(b, s)
 	playSound(51)
   player.bombs = player.bombs + b
+end
+
+function calculateFloaters(dt)
+  if floaterTime.health > -1 then
+    floaterTime.health = floaterTime.health + dt
+  end
+  if floaterTime.money > -1 then
+    floaterTime.money = floaterTime.money + dt
+  end
+
+  if floaterTime.money > .5 then
+    local val = "$" .. formatNumber(floaterTime.moneyTotal)
+    createFloater(player.x, player.y+1, 72, val, {100,255,100})
+    floaterTime.money = -1
+    floaterTime.moneyTotal = 0
+  end
+
+  if floaterTime.health > .5 then
+    local val = "+" .. floaterTime.healthTotal .. "HP"
+    createFloater(player.x, player.y+1, 72, val, {100,100,255})
+    floaterTime.health = -1
+    floaterTime.healthTotal = 0
+  end
 end

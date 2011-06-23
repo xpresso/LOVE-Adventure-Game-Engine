@@ -46,13 +46,13 @@ function drawMapComposite(dt)
         gr.setColor(255,255,255,255)
         if drawIt == true then
           if s.simple == false then
-            eof = (s.t - 1) * 64 + (_f(s.step/2) * 32)
-            gr.drawq(enemies, enemyGrid[s.facing - 1][eof/32], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY)), 0, 1, 1, 16, 32)
+            eof = (s.t - 1) * scrn.ts * 2 + (_f(s.step/2) * scrn.ts)
+            gr.drawq(enemies, enemyGrid[s.facing - 1][eof/scrn.ts], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY)), 0, 1, 1, scrn.tsh, scrn.ts)
           else
             gr.setColor(0,0,0,255*.5)
             gr.rectangle("fill",_f(s.x + mapOffsetX)-7, _f(s.y + mapOffsetY-1),15,1)
             gr.setColor(255,255,255,255)
-            gr.drawq(enemies2, enemy2Grid[_f(s.step/2)], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))-24, 0, 1, 1, 16, 32)
+            gr.drawq(enemies2, enemy2Grid[_f(s.step/2)], _f((s.x+mapOffsetX)), _f((s.y+mapOffsetY))-24, 0, 1, 1, scrn.tsh, scrn.ts)
           end
         end
         gr.line(s.x+mapOffsetX-3, s.y+mapOffsetY, s.x+mapOffsetX+3, s.y+mapOffsetY)
@@ -71,18 +71,36 @@ function drawMapComposite(dt)
         if drawIt then
           local px = (_f((player.x+mapOffsetX)))
           local py = (_f((player.y+mapOffsetY)))
+          gr.drawq(playerImg, actorShadow, px, py, 0, 1, 1, 16, 16)
           if player.attacking > 0 then
             --Draw the player attack pose
-            gr.drawq(playerImg, playerGrid[player.facing - 1][4], px, py, 0, 1, 1, 48, 64)
+            if player.attacking >= 16 then
+              gr.drawq(playerImg, playerGrid[player.facing - 1][4], px, py, 0, 1, 1, 16, 64)
+            else
+              local seg = 9
+              if player.facing ~= 4 then
+                for i=1,seg do
+                  gr.drawq(playerImg, weaponYoyoString, _f((player.yyx/seg)*i + px), _f((player.yyy/seg)*i + py-24), 0, .5, .5, 8, 8)
+                end
+                gr.drawq(playerImg, weaponYoyo, _f(player.yyx + px), _f(player.yyy + py-24), 0, 1, 1, 8, 8)
+              end
+              gr.drawq(playerImg, playerGrid[player.facing - 1][5], px, py, 0, 1, 1, 16, 64)
+              if player.facing == 4 then
+                for i=1,seg do
+                  gr.drawq(playerImg, weaponYoyoString, _f((player.yyx/seg)*i + px), _f((player.yyy/seg)*i + py-24), 0, .5, .5, 8, 8)
+                end
+                gr.drawq(playerImg, weaponYoyo, _f(player.yyx + px), _f(player.yyy + py-24), 0, 1, 1, 8, 8)
+              end
+            end
           else
             --Regular walking player
-            gr.drawq(playerImg, playerGrid[player.facing - 1][_f(player.walking/8)], px, py, 0, 1, 1, 48, 64)
+            gr.drawq(playerImg, playerGrid[player.facing - 1][_f(player.walkframe)], px, py, 0, 1, 1, 16, 64)
           end
         end
       elseif s.n == "TargetArrow" then
         local a = notifGrid[1]
         if player.targetDist < 96 then a = notifGrid[2] end
-        gr.drawq(menuTitle, a, _f(s.x), _f(s.y - 32 + _s(time*10) * 3), 0, 1, 1, 16, 32)
+        gr.drawq(menuTitle, a, _f(s.x), _f(s.y - scrn.ts + _s(time*10) * 3), 0, 1, 1, scrn.tsh, scrn.ts)
       elseif s.n == "Dropped" then
         local o = bounceOffset(s.num)
         if s.life <= 1 then if _s(time*50) < 0 then drawIt = false end end
@@ -90,7 +108,7 @@ function drawMapComposite(dt)
           gr.setColor(0,0,0,255*.5)
           gr.rectangle("fill",_f(s.x + mapOffsetX)-7, _f(s.y + mapOffsetY-1),15,1)
           gr.setColor(255,255,255)
-          gr.drawq(dropItem, itemGrid[dTable[s.id].spr][_f(s.frame)], _f(s.x + mapOffsetX), _f(s.y + mapOffsetY)-o, 0, 1, 1, 16, 32)
+          gr.drawq(dropItem, itemGrid[dTable[s.id].spr][_f(s.frame)], _f(s.x + mapOffsetX), _f(s.y + mapOffsetY)-o, 0, 1, 1, scrn.tsh, scrn.ts)
         end
       elseif s.n == "Projectile" then
         r = _d2r(s.r * 90 + s.spin)
@@ -98,28 +116,30 @@ function drawMapComposite(dt)
           gr.setColor(0,0,0,255*.5)
           gr.rectangle("fill",_f(s.x + mapOffsetX)-7, _f(s.y + mapOffsetY-1),15,1)
           gr.setColor(255,255,255)
-          gr.drawq(projectiles, projectileGrid[s.ty][0], _f(s.x + mapOffsetX), _f(s.y + mapOffsetY)-24, r, 1, 1, 16, 16)
+          gr.drawq(projectiles, projectileGrid[s.ty][0], _f(s.x + mapOffsetX), _f(s.y + mapOffsetY)-24, r, 1, 1, scrn.tsh, scrn.tsh)
         end
       elseif s.n == "Boomerang" then
-        gr.drawq(projectiles, projectileGrid[3][0], _f(s.x+mapOffsetX), _f(s.y+mapOffsetY), s.boomSpin, 1, 1, 16, 16)
+        gr.drawq(projectiles, projectileGrid[3][0], _f(s.x+mapOffsetX), _f(s.y+mapOffsetY), s.boomSpin, 1, 1, scrn.tsh, scrn.tsh)
       elseif s.n == "Explosion" then
         gr.drawq(
           explosions,
           explosionGrid[_f(s.f)][0],
-          _f(s.x + mapOffsetX)+16,
-          _f(s.y + mapOffsetY)-(s.f*2)+16,
+          _f(s.x + mapOffsetX)+scrn.tsh,
+          _f(s.y + mapOffsetY)-(s.f*2)+scrn.tsh,
           s.f,
           1+s.f/2,
           1+s.f/2,
-          16,
-          16
+          scrn.tsh,
+          scrn.tsh
         )
       elseif s.n == "Floater" then
+        local e = s.life
+        if e < 20 then e = 20 end
         gr.setFont(floaterFont)
         gr.setColor(0,0,0,255/2)
-        gr.printf(s.val, _f(s.x + mapOffsetX - 100)+1, _f(s.y + mapOffsetY - (60-s.life)-s.elev)+2, 200, "center")
-        gr.setColor(s.c[1],s.c[2],s.c[3],255-(32-s.life)*3)
-        gr.printf(s.val, _f(s.x + mapOffsetX - 100), _f(s.y + mapOffsetY - (60-s.life)-s.elev), 200, "center")
+        gr.printf(s.val, _f(s.x + mapOffsetX - 100)+1, _f(s.y + mapOffsetY - (60-e)-s.elev)+2, 200, "center")
+        gr.setColor(s.c[1],s.c[2],s.c[3],255-(scrn.ts-s.life)*3)
+        gr.printf(s.val, _f(s.x + mapOffsetX - 100), _f(s.y + mapOffsetY - (60-e)-s.elev), 200, "center")
       else
         gr.setColor(0,0,255)
         gr.rectangle("fill", s.x+mapOffsetX-25, s.y+mapOffsetY-50, 50, 50)
@@ -171,9 +191,9 @@ function drawUpperLayer()
 		  if x < 0 then x = 0 end
 		  if y < 0 then y = 0 end
 			drawTile(mapDeco2[x][y], x, y)
-			if mapHit[x][y] ~= "." and debugVar > 0 then
+			if mapHit[x][y] ~= "." and debugVar > 1 then
 				gr.setColor(255,0,0,100)
-				gr.rectangle("fill", _f(x*32+mapOffsetX), _f(y*32+mapOffsetY), 32, 32)
+				gr.rectangle("fill", _f(x*scrn.ts+mapOffsetX), _f(y*scrn.ts+mapOffsetY), scrn.ts, scrn.ts)
 			end
 		end
 	end
@@ -183,7 +203,7 @@ function drawTile(tmp, x, y)
 	if tmp ~= "0000" then
 		local xx = tonumber(string.sub(tmp, 1, 2))
 		local yy = tonumber(string.sub(tmp, 3, 4))
-		gr.drawq(imgScenery, tileGrid[xx][yy], _f(x*32+mapOffsetX), _f(y*32+mapOffsetY))
+		gr.drawq(imgScenery, tileGrid[xx][yy], _f(x*scrn.ts+mapOffsetX), _f(y*scrn.ts+mapOffsetY))
 		debugTilesDrawn = debugTilesDrawn + 1
 	end
 end
@@ -231,8 +251,8 @@ function drawHealthGuage(x,y,h,m,dt)
   gr.print(t, x+10, y-16)
 
 	for i, h in pairs(healthNuggets) do
-    h.grav = h.grav + 16 * dt
-    h.x = h.x + 32 * dt
+    h.grav = h.grav + scrn.tsh * dt
+    h.x = h.x + scrn.ts * dt
     h.y = h.y + h.grav
 
     gr.setColor(0,255,0,255)
@@ -351,7 +371,7 @@ function drawInventory()
         gr.setColor(150,150,150)
       end
   	  gr.print(v.name, x,y+50)
-  	  gr.print(v.count, x+32,y+50)
+  	  gr.print(v.count, x+scrn.ts,y+50)
       gr.rectangle("line", x-.5,y-.5,64,64)
       gr.setColor(200,100,255)
       gr.rectangle("fill", x+8, y+2, 48, 48)
@@ -385,7 +405,7 @@ function drawDebug(dt)
 		gameData = gameData .. " Current Layer: " .. editorCurrentLayer .. "\n"
 	elseif gameMode == inGame then
 		gameData = gameData .. "PLAYER\n"
-		gameData = gameData .. " X: " .. _f(player.x) .. "(" .. _f(player.x/32) .. "), Y: " .. _f(player.y) .. "(" .. _f(player.y/32) .. ")\n"
+		gameData = gameData .. " X: " .. _f(player.x) .. "(" .. _f(player.x/scrn.ts) .. "), Y: " .. _f(player.y) .. "(" .. _f(player.y/scrn.ts) .. ")\n"
 		gameData = gameData .. " CX: " .. player.cx .. ", CY: " .. player.cy .. "\n"
 		gameData = gameData .. " Walk Frame:      " .. player.walking .. "\n"
 		gameData = gameData .. " Invincibility:   " .. player.invincible .. "\n"
@@ -417,7 +437,7 @@ function drawDebug(dt)
 
 
 --[[		gameData = gameData .. "MAP (#" .. mapNumber .. ")\n"
-		gameData = gameData .. " Size:			" .. mapWidth .. "(" .. mapWidth/32 .. ")/" .. mapHeight .. "(" .. mapHeight/32 .. ")\n"
+		gameData = gameData .. " Size:			" .. mapWidth .. "(" .. mapWidth/scrn.ts .. ")/" .. mapHeight .. "(" .. mapHeight/scrn.ts .. ")\n"
 		gameData = gameData .. " Bounds:		" .. xBounds[0] .. "-" .. xBounds[1] .. ",".. yBounds[0] .. "-" .. yBounds[1] .. "\n"
 		gameData = gameData .. " Offset:		" .. mapOffsetX .. ",".. mapOffsetY .. "\n"
 		gameData = gameData .. " ChangeMap: " .. tostring(changeMap) .. "\n"
@@ -453,8 +473,8 @@ function drawDebug(dt)
 			if objIsMoving > 0 then
 				scriptData = scriptData .. " objIsMoving:  " .. tostring(objIsMoving) .. "\n"
 				scriptData = scriptData .. " objMoveSteps: " .. tostring(objMoveSteps) .. "\n"
-				scriptData = scriptData .. " objX:         " .. tostring(_f(switch[objIsMoving].x)) .. " (" .. _f(switch[objIsMoving].x/32) .. ")\n"
-				scriptData = scriptData .. " objY:         " .. tostring(_f(switch[objIsMoving].y)) .. " (" .. _f(switch[objIsMoving].y/32) .. ")\n"
+				scriptData = scriptData .. " objX:         " .. tostring(_f(switch[objIsMoving].x)) .. " (" .. _f(switch[objIsMoving].x/scrn.ts) .. ")\n"
+				scriptData = scriptData .. " objY:         " .. tostring(_f(switch[objIsMoving].y)) .. " (" .. _f(switch[objIsMoving].y/scrn.ts) .. ")\n"
 			end
 			scriptData = scriptData .. " chainScript:        " .. chainScript .. "\n"
 			scriptData = scriptData .. " dialog.queryChoice: " .. dialog.queryChoice .. "\n"

@@ -1,23 +1,16 @@
-require("source/library/sound.lua") require("source/library/color.lua") require( "source/engine.lua" )
-require( "source/game.lua" ) require( "source/world.lua" ) require( "source/scripting.lua" )
-require( "source/editor.lua" ) require( "source/draw.lua" )
 love.filesystem.setIdentity("Adventure")
 
-_r = math.random _f = math.floor _c = math.cos _s = math.sin _sq = math.sqrt _at2 = math.atan2
+require("source/library/sound.lua") require("source/library/color.lua") require("source/library/richtext.lua")
+require( "source/engine.lua" ) require( "source/game.lua" ) require( "source/world.lua" )
+require( "source/scripting.lua" ) require( "source/editor.lua" ) require( "source/draw.lua" )
+
+_r = math.random _f = math.floor _ce = math.ceil _c = math.cos _s = math.sin _sq = math.sqrt _at2 = math.atan2
 _d2r = math.rad _r2d = math.deg _m = math.mod pi = math.pi
 gr = love.graphics ti = love.timer kb = love.keyboard ms = love.mouse
 
 function love.run()
 	print("Entered love.run() at " .. formatTime(os.time()))
-	screenModes = gr.getModes()
-	enableAudio = love.filesystem.exists("game/audio/")
-	firstRun = false
-	if love.filesystem.exists("conf.lua") == false then
-		local sw = 800 sh = 500
-		createConfiguration(sw, sh)
-		local _ = gr.setMode(sw, sh, false, true, 0)
-		firstRun = true
-	end
+
 	love.load(arg)
 	if arg[2] == "-edit" then end
 	local dt = 0
@@ -28,6 +21,7 @@ function love.run()
 		gr.clear()
 		love.update(dt)
 		love.draw(dt)
+		gr.present()
 		if love.event then
 			for e,a,b,c in love.event.poll() do
 				if e == "q" then
@@ -38,7 +32,6 @@ function love.run()
 			end
 		end
 		ti.sleep(1)
-		gr.present()
 	end
 end
 
@@ -46,7 +39,16 @@ end
 function love.load()
 	print("Entered love.load() at " .. ti.getTime())
 
-	tigrs = love.filesystem.load( 'source/library/tigrs/tigrs.lua' )()
+	enableAudio = true
+
+  scrn = {}
+  scrn.w = 640
+  scrn.h = 400
+  scrn.ts = 32
+  scrn.tsh = scrn.ts / 2
+  scrn.tw = _ce(scrn.w / scrn.ts)
+  scrn.th = _ce(scrn.h / scrn.ts)
+  scrn.scale = 2
 
 	debugVar = 0 --DEBUG CODE
 	debugTilesDrawn = 0
@@ -247,6 +249,8 @@ function love.update(dt)
 		end
 
 		if actionPaused == false then
+      calculateFloaters(dt)
+
 			player.oldXY = tostring(_f(player.x) .. _f(player.y))
 			local kLeft = kb.isDown("left")
 			local kRight = kb.isDown("right")
@@ -256,8 +260,8 @@ function love.update(dt)
 
 			local tpx, tpy
 
-			player.cx = ((((player.x)/32) - _f((player.x)/32)) * 32)-16
-			player.cy = ((((player.y-16)/32) - _f((player.y-16)/32)) * 32)-16
+			player.cx = ((((player.x)/scrn.ts) - _f((player.x)/scrn.ts)) * scrn.ts)-scrn.tsh
+			player.cy = ((((player.y-scrn.tsh)/scrn.ts) - _f((player.y-scrn.tsh)/scrn.ts)) * scrn.ts)-scrn.tsh
 
 			if player.knockTime > 0 then
 				if player.knockDir == 1 then
@@ -325,7 +329,6 @@ function love.update(dt)
 							player.x = tpx
 							player.moving = true
 						else
---							player.x = (_f(tpx / 32)+1) * 32
 							player.x = twoDown(player.x)
 							player.pushTime = player.pushTime + dt
 						end
@@ -339,12 +342,11 @@ function love.update(dt)
 							player.x = tpx
 							player.moving = true
 						else
---							player.x = (_f(tpx / 32)) * 32
 							player.x = twoDown(player.x)
 							player.pushTime = player.pushTime + dt
 						end
 						if kShift ~= true then player.facing = 3 end
-						checkPush(player.x+32,player.y+16)
+						checkPush(player.x+scrn.ts,player.y+scrn.tsh)
 					end
 					if kUp and kDown == false and player.attacking <= 1 then
 						if player.facing ~= 2 then resetPush() end
@@ -353,7 +355,6 @@ function love.update(dt)
 							player.y = tpy
 							player.moving = true
 						else
---							player.y = ((_f(tpy / 32)+1) * 32)
 							player.y = twoDown(player.y)
 							player.pushTime = player.pushTime + dt
 						end
@@ -367,7 +368,6 @@ function love.update(dt)
 							player.y = tpy
 							player.moving = true
 						else
---							player.y = ((_f(tpy / 32)) * 32)
 							player.y = twoDown(player.y)
 							player.pushTime = player.pushTime + dt
 						end
@@ -377,6 +377,7 @@ function love.update(dt)
 					if kLeft == false and kRight == false and kUp == false and kDown == false then
 						resetPush()
 						player.walking = 0
+						player.walkframe = 0
 						player.moving = false
 					end
 				end
@@ -398,14 +399,36 @@ function love.update(dt)
 						player.attackDone = true
 					elseif player.attacking <= 0 and player.hasMeleeWeapon then
 						playSound(10)
-						player.attacking = 10
+						player.attacking = 20
 						player.attackDone = true
 					end
 				end
 			end
 			if kb.isDown(" ") == false then player.attackDone = false end
 
-			if player.attacking > 0 then player.attacking = player.attacking - 1 end
+			if player.attacking > 0 then
+			  player.attacking = player.attacking - player.yoyospeed * dt
+        if player.attacking > 8 and player.attacking <= 16 then
+          player.yoyo = (8-(player.attacking-8)) * player.yoyodist * player.yoyopow
+        elseif player.attacking <= 8 then
+          player.yoyo = player.attacking * player.yoyodist * player.yoyopow
+        else
+          player.yoyo = 0
+        end
+        if player.facing == 1 then
+          player.yyx = -player.yoyo
+          player.yyy = 0
+        elseif player.facing == 3 then
+          player.yyx = player.yoyo
+          player.yyy = 0
+        elseif player.facing == 2 then
+          player.yyx = 0
+          player.yyy = -player.yoyo
+        elseif player.facing == 4 then
+          player.yyx = 0
+          player.yyy = player.yoyo
+        end
+		  end
 
 			if player.invincible > 0 then
 				player.invincible = player.invincible - 1 * dt
@@ -432,6 +455,7 @@ function love.update(dt)
 			else
 				player.moving = false
 				player.walking = 0
+        player.walkframe = 0
 			end
 		end
 
@@ -440,19 +464,11 @@ function love.update(dt)
 			if actionPaused == false then
 				if e.inv > 0 then e.inv = e.inv - 1 * dt end
 				--Check collision Player with Enemy
-				if overlap(_f(e.x-e.w/2), _f(e.y-e.h), e.w, e.h, _f(player.x-16), _f(player.y)-16, 32, 16, "Col_Player_Enemy") == true then hurtPlayer(e.takeHP, 1) end
+				if overlap(_f(e.x-e.w/2), _f(e.y-e.h), e.w, e.h, _f(player.x-scrn.tsh), _f(player.y)-scrn.tsh, scrn.ts, scrn.tsh, "Col_Player_Enemy") == true then hurtPlayer(e.takeHP, 1) end
 				--Check for sword hitting enemy
 				if player.attacking > 0 then
 					hitEnemy = false
-					if player.facing == 1 then
-						if overlap(_f(player.x-48), _f(player.y-32), 48, 32, _f(e.x-16), _f(e.y-32), e.w, e.h, "Col_Hit_Enemy_1") == true and enemy[j].HP > 0 then hitEnemy = true end
-					elseif player.facing == 3 then
-						if overlap(_f(player.x), _f(player.y-32), 48, 32, _f(e.x-16), _f(e.y-32), e.w, e.h, "Col_Hit_Enemy_3") == true and enemy[j].HP > 0 then hitEnemy = true end
-					elseif player.facing == 2 then
-						if overlap(_f(player.x-16), _f(player.y-64), 32, 48, _f(e.x-16), _f(e.y-32), e.w, e.h, "Col_Hit_Enemy_2") == true and enemy[j].HP > 0 then hitEnemy = true end
-					elseif player.facing == 4 then
-						if overlap(_f(player.x-16), _f(player.y-16), 32, 48, _f(e.x-16), _f(e.y-32), e.w, e.h, "Col_Hit_Enemy_4") == true and enemy[j].HP > 0 then hitEnemy = true end
-					end
+					if overlap(_f(player.x+player.yyx-12), _f(player.y+player.yyy-12-24), 24, 24, _f(e.x-scrn.tsh), _f(e.y-scrn.ts), e.w, e.h, "Col_Hit_Enemy_4") == true and e.HP > 0 then hitEnemy = true end
 					if hitEnemy == true and e.inv <= 0 then
 						knockEnemy(j, player.facing, player.meleePower)
 					end
@@ -460,7 +476,7 @@ function love.update(dt)
 				moveEnemy(j, dt)
 			end
 
-			if e.x >= xBounds[0] * 32 and e.x <= xBounds[1] * 32 and e.y >= yBounds[0] * 32 and e.y <= yBounds[1] * 32 and e.HP > 0 then
+			if e.x >= xBounds[0] * scrn.ts and e.x <= xBounds[1] * scrn.ts and e.y >= yBounds[0] * scrn.ts and e.y <= yBounds[1] * scrn.ts and e.HP > 0 then
 				local ss = #sprites+1
 				sprites[ss] = e
 				sprites[ss].n = "Enemy"
@@ -471,7 +487,11 @@ function love.update(dt)
 		updateDropped(dt)
 
 --		if player.pushTime > 0 then player.moving = false player.walking = 0 end
-		if player.moving == true then player.walking = player.walking % 30 + 1 end
+		if player.moving == true then
+		  player.walking = player.walking + 96 * dt % 30
+		  player.walkframe = player.walkframe + 16 * dt
+		  if player.walkframe >= 4 then player.walkframe = 0 end
+	  end
 
 		updateWeather(dt)
 
@@ -483,13 +503,6 @@ function love.update(dt)
 		end
 
 		for j,s in pairs(scenery) do
---[[			if player.x > s.x - 32 and player.x < s.x + 32 and player.y > s.y - 32 and player.y < s.y + 32 then
-				if debugVar == 2 then
-					gr.setColor(255,255,0,255)
-					gr.rectangle("fill", s.x-32+mapOffsetX, s.y-32+mapOffsetY, 64, 64)
-				end
-			end--]]
-
 			local i = #sprites+1
 			sprites[i] = s
 			sprites[i].n = "Scenery"
@@ -522,7 +535,7 @@ function love.update(dt)
     end
 
 		for j, w in pairs(switch) do
-			if w.map == mapNumber and w.x >= xBounds[0] * 32 - 128 and w.x <= xBounds[1] * 32 + 128 and w.y >= yBounds[0] * 32 - 128 and w.y <= yBounds[1] * 32 + 128 then
+			if w.map == mapNumber and w.x >= xBounds[0] * scrn.ts - (scrn.ts*4) and w.x <= xBounds[1] * scrn.ts + (scrn.ts*4) and w.y >= yBounds[0] * scrn.ts - (scrn.ts*4) and w.y <= yBounds[1] * scrn.ts + (scrn.ts*4) then
 				local i = #sprites+1
 				sprites[i] = w
 				sprites[i].sid = j
@@ -808,10 +821,10 @@ function love.keypressed(k)
             end
           end
           if k == "]" then
-            for x=0,mapWidth/32-1 do
-              for y=0,mapHeight/32-1 do
-                if _r(1,20) == 1 and checkCol(x*32,(y-1)*32) == false then
-                  createEnemy(_r(1,5), x*32, y*32, "", true)
+            for x=0,mapWidth/scrn.ts-1 do
+              for y=0,mapHeight/scrn.ts-1 do
+                if _r(1,20) == 1 and checkCol(x*scrn.ts,(y-1)*scrn.ts) == false then
+                  createEnemy(_r(1,5), x*scrn.ts, y*scrn.ts, "", true)
                 end
               end
             end
@@ -837,9 +850,9 @@ function love.keypressed(k)
               --
             end
           end
-          if k == "x" then fireArrow(pArrow, player.facing, 512, 1) end
-          if k == "b" then placeBomb(player.x, player.y-16, 100, 1) end
-          if k == "v" then throwBoomerang(player.boomerangPower * 50, player.facing, player.boomerangPower * 256, 1) end
+          if k == "x" then fireArrow(pArrow, player.facing, (scrn.ts*8), 1) end
+          if k == "b" then placeBomb(player.x, player.y-scrn.tsh, 100, 1) end
+          if k == "v" then throwBoomerang(player.boomerangPower * 50, player.facing, player.boomerangPower * (scrn.ts*4), 1) end
           if k == "z" and player.moving == false then
             if player.targeting == 0 then
               local c = findClosestEnemy()
@@ -925,10 +938,10 @@ function love.mousepressed( x, y, button )
 		editorMouseDown(x,y,button)
 	elseif gameMode == inGame then
 	  if testMode then
-      player.x = _f((x-mapOffsetX)/32)*32
-      player.y = _f((y-mapOffsetY)/32)*32+32
+      player.x = _f((x-mapOffsetX)/scrn.ts)*scrn.ts
+      player.y = _f((y-mapOffsetY)/scrn.ts)*scrn.ts+scrn.ts
     else
-      createEnemy(_r(1,5), _f((x-mapOffsetX)/32)*32, _f((y-mapOffsetY)/32)*32+32, "", true)
+      createEnemy(_r(1,5), _f((x-mapOffsetX)/scrn.ts)*scrn.ts, _f((y-mapOffsetY)/scrn.ts)*scrn.ts+scrn.ts, "", true)
     end
 	end
 end

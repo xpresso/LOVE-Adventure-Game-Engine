@@ -171,7 +171,9 @@ function closeInventory()
 end
 
 --TURN A SPECIFIED NPC TO FACE THE PLAYER
-function turnNPCToFaceMe(n) if player.facing == 1 then npc[n].facing = 3 elseif player.facing == 3 then npc[n].facing = 1 elseif player.facing == 2 then npc[n].facing = 4 elseif player.facing == 4 then npc[n].facing = 2 end end
+function turnNPCToFaceMe(n)
+  if player.facing == 1 then npc[n].facing = 3 elseif player.facing == 3 then npc[n].facing = 1 elseif player.facing == 2 then npc[n].facing = 4 elseif player.facing == 4 then npc[n].facing = 2 end
+end
 
 --UPDATE FADE
 function doFade(dt)
@@ -314,7 +316,7 @@ function createSettings()
 	love.filesystem.write("settings.lua", data, all)
 end
 
-
+--LOGO
 function logoLoad()
   if logoExists == nil then
     logoExists = true
@@ -365,6 +367,7 @@ function logoDraw()
 	if logoBounceP then gr.drawq(menuTitle, imgLogoPresents, screenW/2, _f(screenH/2+30-bounceOffset(logoBounceP)), 0, sc, sc, 130, 54) end
 end
 
+
 function setTutorMsg(t)
   onScreenTutorialTime = 3
   onScreenTutorialMsg = t
@@ -397,8 +400,10 @@ function sort(T) table.sort(T, function(a, b) return a.y < b.y end ) end
 
 function twoDown(n) return _f((n) / 2) * 2 end
 
-function formatNumber(number)
-   return (string.format("%d", number):reverse():gsub( "(%d%d%d)" , "%1," ):reverse():gsub("^(-?),","%1"))
+function formatNumber(number,w)
+  if w then return string.format("%d", number):reverse():gsub( "(%d%d%d)" , "%1," ):reverse():gsub("^(-?),","%1")
+  else return string.format("%.2f", number):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,?", "")
+  end
 end
 
 function bezier_curveline( x1, y1, hx1, hy1, x2, y2, hx2, hy2, samples )

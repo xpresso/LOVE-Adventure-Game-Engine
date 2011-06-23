@@ -249,7 +249,6 @@ function updateBoomerang(dt)
 end
 
 explosion = {}
-
 function spawnExplosion(x,y)
 	print("Spawning Explosion: " .. x .. "," .. y)
 	table.insert(explosion, {x = x, y = y, f = 0})
@@ -301,7 +300,8 @@ function spawnDropped(id,xx,yy,t)
   else
     nf = 1 l = 10
   end
-	table.insert(dropped, num, { x = _f(xx), y = _f(yy)+(_r(1,10)/100), time = t, id = id, frame = 0, nf = nf, dt = time, life = l, active = false })
+  local dist = _r(4,8) * 64
+	table.insert(dropped, num, { x = _f(xx), y = _f(yy)+(_r(1,10)/100), time = t, id = id, frame = 0, nf = nf, dt = time, life = l, active = false, dist = dist })
   bounce[num].callback = function(id) dropped[id].active = true end
 end
 
@@ -469,7 +469,7 @@ end
 
 function knockEnemy(e, dir, p)
 	print("Knock Enemy "..e.." with "..p)
-	if enemy[e].inv <= 0 then enemy[e].inv = .5 end
+	if enemy[e].inv <= 0 then enemy[e].inv = .25 end
 	enemy[e].knockTime = 24
 	enemy[e].knockDir = dir
 end
@@ -597,8 +597,11 @@ end
 
 function destroyEnemy(e)
 	print("Destroy Enemy "..e)
+  for i=1,_r(1,20) do
+  	spawnDropped(_r(1,3),enemy[e].x,enemy[e].y,-1)
+  end
   for i=1,_r(1,3) do
-  	spawnDropped(_r(1,6),enemy[e].x,enemy[e].y,-1)
+  	spawnDropped(_r(4,6),enemy[e].x,enemy[e].y,-1)
   end
   spawnExperience(e)
 	spawnExplosion(enemy[e].x,enemy[e].y-16)
@@ -642,20 +645,8 @@ function updateHotZones()
 	end
 end
 
-
 --OVERLAP
-function overlap(x1,y1,w1,h1,x2,y2,w2,h2, i)
-	local tl, bl, tr, br = false, false, false, false
-	if (x2 >= x1 and x2 <= (x1 + w1)) and (y2 >= y1 and y2 <= (y1 + h1)) then tl = true end
-	if (x2+w2 >= x1 and x2+w2 <= (x1 + w1)) and (y2 >= y1 and y2 <= (y1 + h1)) then tr = true end
-	if (x2 >= x1 and x2 <= (x1 + w1)) and (y2+h2 >= y1 and y2+h2 <= (y1 + h1)) then bl = true end
-	if (x2+w2 >= x1 and x2+w2 <= (x1 + w1)) and (y2+h2 >= y1 and y2+h2 <= (y1 + h1)) then br = true end
-
-	if (x1 >= x2 and x1 <= (x2 + w2)) and (y1 >= y2 and y1 <= (y2 + h2)) then tl = true end
-	if (x1+w1 >= x2 and x1+w1 <= (x2 + w2)) and (y1 >= y2 and y1 <= (y2 + h2)) then tr = true end
-	if (x1 >= x2 and x1 <= (x2 + w2)) and (y1+h1 >= y2 and y1+h1 <= (y2 + h2)) then bl = true end
-	if (x1+w1 >= x2 and x1+w1 <= (x2 + w2)) and (y1+h1 >= y2 and y1+h1 <= (y2 + h2)) then br = true end
-
+function overlap(x1,y1,w1,h1, x2,y2,w2,h2, i)
 	if debugVar == 2 then
 		gr.setColor(0,0,0,100)
 		gr.line(x1+mapOffsetX, y1+mapOffsetY, x2+mapOffsetX, y2+mapOffsetY)
@@ -668,7 +659,16 @@ function overlap(x1,y1,w1,h1,x2,y2,w2,h2, i)
 		gr.print(i, x1+mapOffsetX, y1+mapOffsetY+h1)
 		gr.print(i, x2+mapOffsetX, y2+mapOffsetY+h2)
 	end
-	if tl or tr or bl or br then return true else return false end
+
+--[[	return (x2 >= x1 and x2 <= x1+w1) and (y2 >= y1 and y2 <= y1+h1) or
+		(x2+w2 >= x1 and x2+w2 <= x1+w1) and (y2 >= y1 and y2 <= y1+h1) or
+		(x2 >= x1 and x2 <= x1+w1) and (y2+h2 >= y1 and y2+h2 <= y1+h1) or
+		(x2+w2 >= x1 and x2+w2 <= x1+w1) and (y2+h2 >= y1 and y2+h2 <= y1+h1) or
+		(x1 >= x2 and x1 <= x2+w2) and (y1 >= y2 and y1 <= y2+h2) or
+		(x1+w1 >= x2 and x1+w1 <= x2+w2) and (y1 >= y2 and y1 <= y2+h2) or
+		(x1 >= x2 and x1 <= x2+w2) and (y1+h1 >= y2 and y1+h1 <= y2+h2) or
+		(x1+w1 >= x2 and x1+w1 <= x2+w2) and (y1+h1 >= y2 and y1+h1 <= y2+h2)--]]
+  return not (x1+w1 < x2  or x2+w2 < x1 or y1+h1 < y2 or y2+h2 < y1)
 end
 
 --CHECK COLLISION
@@ -700,7 +700,7 @@ function checkForThing()
 			elseif player.facing == 3 then
 				x,y,w,h = player.x,player.y-16,48,16
 			elseif player.facing == 2 then
-				x,y,w,h = player.x-12,player.y-52,24,36
+				x,y,w,h = player.x-12,player.y-60,24,36
 			elseif player.facing == 4 then
 				x,y,w,h = player.x-12,player.y,24,32
 			end

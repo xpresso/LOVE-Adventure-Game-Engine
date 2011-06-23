@@ -15,6 +15,7 @@ function loadScript(s)
 		error("Oops! It seems you are missing a certain script file.\nThe script \"" .. mFile .. "\" seems to be missing from its home.\nThis is not good since the game has no direction in life and must now end.")
 	end
 	player.walking = 0
+  player.walkframe = 0
 	player.moving = false
 end
 
@@ -62,8 +63,8 @@ function runScript(dt)
 				fade.to = 255
 				if fade.val >= 255 then
 					facePlayer(p4)
-					player.x = tonumber(p2) * 32
-					player.y = tonumber(p3) * 32
+					player.x = tonumber(p2) * scrn.ts
+					player.y = tonumber(p3) * scrn.ts
 					scrollToX = player.x
 					scrollToY = player.y
 					camera.x = player.x
@@ -76,12 +77,12 @@ function runScript(dt)
 				end
 			elseif l == "SETPLAYERPOS" then
 				facePlayer(p3)
-				player.x = tonumber(p1) * 32
-				player.y = tonumber(p2) * 32
+				player.x = tonumber(p1) * scrn.ts
+				player.y = tonumber(p2) * scrn.ts
 				script[scriptLine].d = true
 			elseif l == "MOVEPLAYER" then
 				actorIsMoving = 0
-				actorMoveSteps = 32 * tonumber(p2)
+				actorMoveSteps = tonumber(p2) * scrn.ts
 				actorMoveDirection = p1
 			elseif l == "CHANGEMAP" then
 				fade.to = 255
@@ -99,13 +100,13 @@ function runScript(dt)
 				if player.money < 0 then player.money = 0 end
 				script[scriptLine].d = true
 			elseif l == "MOVENPC" then
-				for x=0,mapWidth/32-1 do
-					for y=0,mapHeight/32-1 do
+				for x=0,mapWidth/scrn.ts-1 do
+					for y=0,mapHeight/scrn.ts-1 do
 						if mapHit[x][y] == "n" then mapHit[x][y] = "." end
 					end
 				end
 				actorIsMoving = tonumber(p1)
-				actorMoveSteps = 32 * tonumber(p3)
+				actorMoveSteps = tonumber(p3) * scrn.ts
 				actorMoveDirection = p2
 			elseif l == "FACENPC" then
 				if p2 == "L" then
@@ -120,10 +121,10 @@ function runScript(dt)
 				script[scriptLine].d = true
 			elseif l == "WARPNPC" then
 				npc[p1].map = p2
-				npc[p1].x = tonumber(p3) * 32
-				npc[p1].y = tonumber(p4) * 32+32
-				for x=0,mapWidth/32-1 do
-					for y=0,mapHeight/32-1 do
+				npc[p1].x = tonumber(p3) * scrn.ts
+				npc[p1].y = tonumber(p4) * scrn.ts+scrn.ts
+				for x=0,mapWidth/scrn.ts-1 do
+					for y=0,mapHeight/scrn.ts-1 do
 						if mapHit[x][y] == "n" then mapHit[x][y] = "." end
 					end
 				end
@@ -262,9 +263,9 @@ function openDialog()
 	end
 
 	if horizOffset < screenW / 2 then
-		dialog.x = 32
+		dialog.x = scrn.ts
 	else
-		dialog.x = screenW - dialog.w - 32
+		dialog.x = screenW - dialog.w - scrn.ts
 	end
 
 	print(spaceAbove)
@@ -285,15 +286,17 @@ function drawDialog(dt)
 			gr.setColor(0,0,0,127)
 			gr.rectangle("fill", 0, dialog.y+sOff, screenW, dialog.h)
 			gr.setColor(0,0,0,255)
-			if dialog.location ~= 1 then gr.drawq(menuTitle, dialogGrid[4][0], npc[dialogWhoSaid].x + mapOffsetX + camera.shakeX - 16, dialog.y + dialog.h + sOff) end
+			if dialog.location ~= 1 then
+			  gr.drawq(menuTitle, dialogGrid[4][0], npc[dialogWhoSaid].x + mapOffsetX + _f(sOff/3)+scrn.ts, dialog.y + dialog.h + sOff, 0, -1, 1, scrn.tsh, 0)
+		  end
 
 			--TALK BALLOON
 			gr.setColor(255,255,255,255)
 			gr.rectangle("fill", 0, dialog.y, screenW, dialog.h)
 			if dialog.location == 1 then
-				gr.drawq(menuTitle, dialogGrid[1][0], npc[dialogWhoSaid].x + mapOffsetX + camera.shakeX - 16, dialog.y - 32)
+				gr.drawq(menuTitle, dialogGrid[1][0], npc[dialogWhoSaid].x + mapOffsetX + scrn.ts, dialog.y - scrn.ts, 0, -1, 1, scrn.tsh, 0)
 			else
-				gr.drawq(menuTitle, dialogGrid[0][0], npc[dialogWhoSaid].x + mapOffsetX + camera.shakeX - 16, dialog.y + dialog.h)
+				gr.drawq(menuTitle, dialogGrid[0][0], npc[dialogWhoSaid].x + mapOffsetX + scrn.ts, dialog.y + dialog.h, 0, -1, 1, scrn.tsh, 0)
 			end
 		end
 
@@ -301,13 +304,15 @@ function drawDialog(dt)
     if dialog.location == 1 then dit = 20 end
 		m = string.sub(dialog.text, 1, dialog.cursor)
 		m2 = string.sub(dialog.text, 1, dialog.cursor+1)
+
 		gr.setFont(dialogFont)
+
+		--rt = rich.new{m, 800, black = {0, 0, 0}, green = {0, 255, 0}, big = dialogFont, red = {255, 0, 0}}
+
 		if dialogWhoSaid <= 0 then gr.setColor(255,255,255,10) else gr.setColor(0,0,0,10) end
-    for i=1,10 do
-  		gr.printf(m2, 32+_r(-4,4), dialog.y + dit+_r(-4,4), screenW-64, "center")
-  	end
+    gr.printf(m2, scrn.ts+1, dialog.y + dit+2, screenW-scrn.ts*2, "center")
 		if dialogWhoSaid <= 0 then gr.setColor(255,255,255,255) else gr.setColor(0,0,0,255) end
-		gr.printf(m, 32, dialog.y + dit, screenW-64, "center")
+		gr.printf(m, scrn.ts, dialog.y + dit, screenW-scrn.ts*2, "center")
 
 		if dialog.cursor < string.len(dialog.text) then
 			if string.sub(m, -1) ~= " " then playSound(997) end
@@ -315,7 +320,7 @@ function drawDialog(dt)
 		else
 			if queryChoices ~= nil then
 				gr.setColor(255,255,255,255)
-				gr.rectangle("fill", (screenW/2)-200+((dialog.queryChoice-1)*200), screenH - 40, 200, 32)
+				gr.rectangle("fill", (screenW/2)-200+((dialog.queryChoice-1)*200), screenH - 40, 200, scrn.ts)
 
 				for i=1,table.getn(queryChoices) do
 					if i == dialog.queryChoice then gr.setColor(0,0,0,255) else gr.setColor(255,255,255,255) end
@@ -325,6 +330,7 @@ function drawDialog(dt)
 			gr.setColor(255,255,255,255)
 			gr.setFont(dialogFont)
 			gr.print("PRESS SPACE", screenW - 180, 10)
+    --rt:draw(100,200)
 		end
 		gr.setColorMode("replace")
 	end
@@ -373,13 +379,14 @@ function moveActor(dt)
 				player.facing = 4
 			end
 			actorMoveSteps = actorMoveSteps - 2
-			player.walking = player.walking + 1
-			if player.walking >= 32 then player.walking = 0 end
+			player.walking = player.walking + scrn.ts * dt
+			if player.walking >= scrn.ts then player.walking = 0 end
 		else
 			player.x = _f(player.x)
 			player.y = _f(player.y)
 			player.moving = false
 			player.walking = 0
+      player.walkframe = 0
 			actorIsMoving = -1
 		end
 	elseif actorIsMoving > 0 then
@@ -401,7 +408,7 @@ function moveActor(dt)
 			end
 			actorMoveSteps = actorMoveSteps - 4
 			npc[actorIsMoving].step = npc[actorIsMoving].step + 2
-			if npc[actorIsMoving].step >= 32 then npc[actorIsMoving].step = 0 end
+			if npc[actorIsMoving].step >= scrn.ts then npc[actorIsMoving].step = 0 end
 		else
 			npc[actorIsMoving].x = _f(npc[actorIsMoving].x)
 			npc[actorIsMoving].y = _f(npc[actorIsMoving].y)

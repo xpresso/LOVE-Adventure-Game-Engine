@@ -12,12 +12,15 @@ addPushable(3, 8*32, 38*32+.01, 80, false, "Door Closed 1", "warps/door_shed_in"
 
 if gameFlag[600] == 1 then
 	table.insert(scenery, { x = 800, y = 320+8, id = "Fire", z = 2,
-													sx = 1, sy = 1, ox = 16, oy = 32+8, sp = 10, fra = 1, active = true} )
+			sx = 1, sy = 1, ox = 16, oy = 32+8, sp = 10, fra = 1, active = true} )
 end
 
-table.insert(scenery, 10000, { x = 656, y = 1190.01, id = "Clock Face", z = 2, sx = 1, sy = 1, elev = -160} )
-table.insert(scenery, 10001, { x = 656, y = 1190.02, id = "Clock Hand Hour", z = 2, sx = .75, sy = .75, r = 0, elev = -160} )
-table.insert(scenery, 10002, { x = 656, y = 1190.03, id = "Clock Hand Minute", z = 2, sx = .75, sy = .75, r = 0, elev = -160} )
+table.insert(scenery, 10000, { x = 656, y = 1190.01, id = "Clock Face", z = 2,
+    sx = 1, sy = 1, elev = -160} )
+table.insert(scenery, 10001, { x = 656, y = 1190.02, id = "Clock Hand Hour", z = 2,
+    sx = .75, sy = .75, r = 0, elev = -160} )
+table.insert(scenery, 10002, { x = 656, y = 1190.03, id = "Clock Hand Minute", z = 2,
+    sx = .75, sy = .75, r = 0, elev = -160} )
 
 table.insert(scenery, 10100, { x = 656, y = 0, id = "Sun", z = 2, sx = 1, sy = 1, elev = 250, s = 2} )
 
